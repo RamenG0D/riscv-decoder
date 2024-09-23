@@ -3,11 +3,6 @@ use instruction_creator::instructions;
 pub type InstructionSize = u32;
 pub type SignedInstructionSize = i32;
 
-// SHOULD ONLY BE USED TO GENERATE THE INSTRUCTION BASE / MASK (uses lots of const fn's and such to stay at comptime as much as possible)
-struct InstructionBuilder {
-    inst: InstructionSize,
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InstructionFormat {
     RType,
@@ -63,7 +58,6 @@ instructions! {
     // immediate
     addi {
         pub const FUNCT3: u32 = 0;
-        pub const FUNCT7: u32 = 0;
     }
     xori {
         pub const FUNCT3: u32 = 4;
@@ -106,28 +100,36 @@ instructions! {
     // load
     lb {
         pub const FUNCT3: u32 = 0;
+        pub const FUNCT7: u32 = 0;
     }
     lh {
         pub const FUNCT3: u32 = 1;
+        pub const FUNCT7: u32 = 0;
     }
     lw {
         pub const FUNCT3: u32 = 2;
+        pub const FUNCT7: u32 = 0;
     }
     lbu {
         pub const FUNCT3: u32 = 4;
+        pub const FUNCT7: u32 = 0;
     }
     lhu {
         pub const FUNCT3: u32 = 5;
+        pub const FUNCT7: u32 = 0;
     }
     // store
     sb {
         pub const FUNCT3: u32 = 0;
+        pub const FUNCT7: u32 = 0;
     }
     sh {
         pub const FUNCT3: u32 = 1;
+        pub const FUNCT7: u32 = 0;
     }
     sw {
         pub const FUNCT3: u32 = 2;
+        pub const FUNCT7: u32 = 0;
     }
     // branch
     beq {}
@@ -148,8 +150,12 @@ instructions! {
     csrrsi {}
     csrrci {}
     // fence
-    fence {}
-    fence_i {}
+    fence {
+        pub const FUNCT3: u32 = 0;
+    }
+    fence_i {
+        pub const FUNCT3: u32 = 1;
+    }
     // atomic
     lr_w {}
     sc_w {}
@@ -292,6 +298,10 @@ pub mod itype {
     impl IType {
         pub fn new(inst: InstructionSize) -> Self {
             Self(inst)
+        }
+
+        pub fn imm(&self) -> InstructionSize {
+            self.imm1() as InstructionSize
         }
     }
 

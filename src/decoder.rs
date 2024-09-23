@@ -1,67 +1,146 @@
 use crate::{decoded_inst::InstructionDecoded, error::DecodeError, instructions::*};
 use anyhow::{Context, Result};
-use compressed::is_compressed;
 
 pub fn decode_rtype(inst: InstructionSize) -> Result<InstructionDecoded> {
     let inst = rtype::RType::new(inst);
-    match (inst.funct3(), inst.funct7()) {
-        (addi::FUNCT3, addi::FUNCT7) => Ok(InstructionDecoded::Add {
+    match (inst.opcode(), inst.funct3(), inst.funct7()) {
+        (ARITMETIC_REGISTER_MATCH, add::FUNCT3, add::FUNCT7) => Ok(InstructionDecoded::Add {
             rd: inst.rd(),
             rs1: inst.rs1(),
             rs2: inst.rs2(),
         }),
-        (sub::FUNCT3, sub::FUNCT7) => Ok(InstructionDecoded::Sub {
+        (ARITMETIC_REGISTER_MATCH, sub::FUNCT3, sub::FUNCT7) => Ok(InstructionDecoded::Sub {
             rd: inst.rd(),
             rs1: inst.rs1(),
             rs2: inst.rs2(),
         }),
-        (sll::FUNCT3, sll::FUNCT7) => Ok(InstructionDecoded::Sll {
+        (ARITMETIC_REGISTER_MATCH, sll::FUNCT3, sll::FUNCT7) => Ok(InstructionDecoded::Sll {
             rd: inst.rd(),
             rs1: inst.rs1(),
             rs2: inst.rs2(),
         }),
-        (slt::FUNCT3, slt::FUNCT7) => Ok(InstructionDecoded::Slt {
+        (ARITMETIC_REGISTER_MATCH, slt::FUNCT3, slt::FUNCT7) => Ok(InstructionDecoded::Slt {
             rd: inst.rd(),
             rs1: inst.rs1(),
             rs2: inst.rs2(),
         }),
-        (sltu::FUNCT3, sltu::FUNCT7) => Ok(InstructionDecoded::Sltu {
+        (ARITMETIC_REGISTER_MATCH, sltu::FUNCT3, sltu::FUNCT7) => Ok(InstructionDecoded::Sltu {
             rd: inst.rd(),
             rs1: inst.rs1(),
             rs2: inst.rs2(),
         }),
-        (xor::FUNCT3, xor::FUNCT7) => Ok(InstructionDecoded::Xor {
+        (ARITMETIC_REGISTER_MATCH, xor::FUNCT3, xor::FUNCT7) => Ok(InstructionDecoded::Xor {
             rd: inst.rd(),
             rs1: inst.rs1(),
             rs2: inst.rs2(),
         }),
-        (srl::FUNCT3, srl::FUNCT7) => Ok(InstructionDecoded::Srl {
+        (ARITMETIC_REGISTER_MATCH, srl::FUNCT3, srl::FUNCT7) => Ok(InstructionDecoded::Srl {
             rd: inst.rd(),
             rs1: inst.rs1(),
             rs2: inst.rs2(),
         }),
-        (sra::FUNCT3, sra::FUNCT7) => Ok(InstructionDecoded::Sra {
+        (ARITMETIC_REGISTER_MATCH, sra::FUNCT3, sra::FUNCT7) => Ok(InstructionDecoded::Sra {
             rd: inst.rd(),
             rs1: inst.rs1(),
             rs2: inst.rs2(),
         }),
-        (or::FUNCT3, or::FUNCT7) => Ok(InstructionDecoded::Or {
+        (ARITMETIC_REGISTER_MATCH, or::FUNCT3, or::FUNCT7) => Ok(InstructionDecoded::Or {
             rd: inst.rd(),
             rs1: inst.rs1(),
             rs2: inst.rs2(),
         }),
-        (and::FUNCT3, and::FUNCT7) => Ok(InstructionDecoded::And {
+        (ARITMETIC_REGISTER_MATCH, and::FUNCT3, and::FUNCT7) => Ok(InstructionDecoded::And {
             rd: inst.rd(),
             rs1: inst.rs1(),
             rs2: inst.rs2(),
         }),
-        _ => Err(DecodeError::UnknownInstructionFormat)?,
+        _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown R-Type instruction"),
     }
 }
 
 pub fn decode_itype(inst: InstructionSize) -> Result<InstructionDecoded> {
     let iinst = itype::IType::new(inst);
-    todo!()
+    match (iinst.opcode(), iinst.funct3(), iinst.imm()) {
+        (ARITMETIC_IMMEDIATE_MATCH, addi::FUNCT3, _) => Ok(InstructionDecoded::Addi {
+            rd: iinst.rd(),
+            rs1: iinst.rs1(),
+            imm: iinst.imm(),
+        }),
+        (ARITMETIC_IMMEDIATE_MATCH, slti::FUNCT3, _) => Ok(InstructionDecoded::Slti {
+            rd: iinst.rd(),
+            rs1: iinst.rs1(),
+            imm: iinst.imm(),
+        }),
+        (ARITMETIC_IMMEDIATE_MATCH, sltiu::FUNCT3, _) => Ok(InstructionDecoded::Sltiu {
+            rd: iinst.rd(),
+            rs1: iinst.rs1(),
+            imm: iinst.imm(),
+        }),
+        (ARITMETIC_IMMEDIATE_MATCH, xori::FUNCT3, _) => Ok(InstructionDecoded::Xori {
+            rd: iinst.rd(),
+            rs1: iinst.rs1(),
+            imm: iinst.imm(),
+        }),
+        (ARITMETIC_IMMEDIATE_MATCH, ori::FUNCT3, _) => Ok(InstructionDecoded::Ori {
+            rd: iinst.rd(),
+            rs1: iinst.rs1(),
+            imm: iinst.imm(),
+        }),
+        (ARITMETIC_IMMEDIATE_MATCH, andi::FUNCT3, _) => Ok(InstructionDecoded::Andi {
+            rd: iinst.rd(),
+            rs1: iinst.rs1(),
+            imm: iinst.imm(),
+        }),
+        (ARITMETIC_IMMEDIATE_MATCH, slli::FUNCT3, slli::IMM) => Ok(InstructionDecoded::Slli {
+            rd: iinst.rd(),
+            rs1: iinst.rs1(),
+            imm: iinst.imm(),
+        }),
+        (ARITMETIC_IMMEDIATE_MATCH, srli::FUNCT3, srli::IMM) => Ok(InstructionDecoded::Srli {
+            rd: iinst.rd(),
+            rs1: iinst.rs1(),
+            imm: iinst.imm(),
+        }),
+        (ARITMETIC_IMMEDIATE_MATCH, srai::FUNCT3, srai::IMM) => Ok(InstructionDecoded::Srai {
+            rd: iinst.rd(),
+            rs1: iinst.rs1(),
+            imm: iinst.imm(),
+        }),
+        (LOAD_MATCH, lb::FUNCT3, _) => Ok(InstructionDecoded::Lb {
+            rd: iinst.rd(),
+            rs1: iinst.rs1(),
+            imm: iinst.imm(),
+        }),
+        (LOAD_MATCH, lh::FUNCT3, _) => Ok(InstructionDecoded::Lh {
+            rd: iinst.rd(),
+            rs1: iinst.rs1(),
+            imm: iinst.imm(),
+        }),
+        (LOAD_MATCH, lw::FUNCT3, _) => Ok(InstructionDecoded::Lw {
+            rd: iinst.rd(),
+            rs1: iinst.rs1(),
+            imm: iinst.imm(),
+        }),
+        (LOAD_MATCH, lbu::FUNCT3, _) => Ok(InstructionDecoded::Lbu {
+            rd: iinst.rd(),
+            rs1: iinst.rs1(),
+            imm: iinst.imm(),
+        }),
+        (LOAD_MATCH, lhu::FUNCT3, _) => Ok(InstructionDecoded::Lhu {
+            rd: iinst.rd(),
+            rs1: iinst.rs1(),
+            imm: iinst.imm(),
+        }),
+        (JALR_MATCH, jalr::FUNCT3, _) => Ok(InstructionDecoded::Jalr {
+            rd: iinst.rd(),
+            rs1: iinst.rs1(),
+            imm: iinst.imm(),
+        }),
+        (FENCE_MATCH, fence::FUNCT3, _) => todo!(),
+        (FENCE_MATCH, fence_i::FUNCT3, _) => todo!(),
+        (CSR_MATCH, _, _) => todo!(),
+        _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown I-Type instruction"),
+    }
 }
 
 pub fn decode_stype(inst: InstructionSize) -> Result<InstructionDecoded> {
@@ -84,14 +163,6 @@ pub fn decode_jtype(inst: InstructionSize) -> Result<InstructionDecoded> {
     todo!()
 }
 
-pub fn decode(inst: InstructionSize) -> Result<(InstructionDecoded, bool)> {
-    if is_compressed(inst) {
-        try_decode_compressed(inst).map(|inst| (inst, true))
-    } else {
-        try_decode(inst).map(|inst| (inst, false))
-    }
-}
-
 pub fn try_decode(inst: InstructionSize) -> Result<InstructionDecoded> {
     const OPCODE_MASK: InstructionSize = 0b1111111;
 
@@ -104,6 +175,8 @@ pub fn try_decode(inst: InstructionSize) -> Result<InstructionDecoded> {
             InstructionFormat::IType
         }
         LUI_MATCH | AUIPC_MATCH => InstructionFormat::UType,
+        // TODO: Support compressed instructions
+        // inst if is_compressed(inst) => InstructionFormat::Compressed,
         _ => Err(DecodeError::UnknownInstructionFormat)?,
     };
 
@@ -114,12 +187,13 @@ pub fn try_decode(inst: InstructionSize) -> Result<InstructionDecoded> {
         InstructionFormat::UType => decode_utype(inst)?,
         InstructionFormat::BType => decode_btype(inst)?,
         InstructionFormat::JType => decode_jtype(inst)?,
+        // TODO: Support compressed instructions
+        // InstructionFormat::Compressed => decode_compressed(inst)?,
     };
 
     Ok(inst)
 }
 
 pub fn try_decode_compressed(_inst: InstructionSize) -> Result<InstructionDecoded> {
-    return Err(anyhow::anyhow!(DecodeError::UnknownInstructionFormat))
-        .context("Compressed instructions are not supported yet");
+    Err(DecodeError::UnknownInstructionFormat).context("Compressed instructions are not supported yet")
 }

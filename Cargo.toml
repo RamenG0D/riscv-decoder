@@ -10,4 +10,4 @@ bitfield = "0.17.0"
 
 [dependencies.instruction-creator]
 path = "instruction-creator"
-version = "*"
+version = "0.1.0"
