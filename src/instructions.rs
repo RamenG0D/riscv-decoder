@@ -132,16 +132,26 @@ instructions! {
         pub const FUNCT7: u32 = 0;
     }
     // branch
-    beq {}
-    bne {}
-    blt {}
-    bge {}
-    bltu {}
-    bgeu {}
-    // jump
-    jal {
-        /* Nothing Here */
+    beq {
+        pub const FUNCT3: u32 = 0;
     }
+    bne {
+        pub const FUNCT3: u32 = 1;
+    }
+    blt {
+        pub const FUNCT3: u32 = 4;
+    }
+    bge {
+        pub const FUNCT3: u32 = 5;
+    }
+    bltu {
+        pub const FUNCT3: u32 = 6;
+    }
+    bgeu {
+        pub const FUNCT3: u32 = 7;
+    }
+    // jump
+    jal { /* Nothing Here */ }
     // csr
     csrrw {}
     csrrs {}
@@ -169,8 +179,8 @@ instructions! {
     amominu_w {}
     amomaxu_w {}
     // utype
-    lui {}
-    auipc {}
+    lui { /* Nothing here */ }
+    auipc { /* Nothing here */ }
 }
 
 pub mod compressed {
@@ -382,6 +392,10 @@ pub mod utype {
     impl UType {
         pub fn new(inst: InstructionSize) -> Self {
             Self(inst)
+        }
+
+        pub fn imm(&self) -> InstructionSize {
+            self.imm1() as InstructionSize
         }
     }
 

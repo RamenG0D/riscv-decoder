@@ -145,22 +145,87 @@ pub fn decode_itype(inst: InstructionSize) -> Result<InstructionDecoded> {
 
 pub fn decode_stype(inst: InstructionSize) -> Result<InstructionDecoded> {
     let sinst = stype::SType::new(inst);
-    todo!()
+    match sinst.funct3() {
+        sb::FUNCT3 => Ok(InstructionDecoded::Sb {
+            rs1: sinst.rs1(),
+            rs2: sinst.rs2(),
+            imm: sinst.imm(),
+        }),
+        sh::FUNCT3 => Ok(InstructionDecoded::Sh {
+            rs1: sinst.rs1(),
+            rs2: sinst.rs2(),
+            imm: sinst.imm(),
+        }),
+        sw::FUNCT3 => Ok(InstructionDecoded::Sw {
+            rs1: sinst.rs1(),
+            rs2: sinst.rs2(),
+            imm: sinst.imm(),
+        }),
+        _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown S-Type instruction"),
+    }
 }
 
 pub fn decode_utype(inst: InstructionSize) -> Result<InstructionDecoded> {
     let uinst = utype::UType::new(inst);
-    todo!()
+    match uinst.opcode() {
+        LUI_MATCH => Ok(InstructionDecoded::Lui {
+            rd: uinst.rd(),
+            imm: uinst.imm(),
+        }),
+        AUIPC_MATCH => Ok(InstructionDecoded::AuiPc {
+            rd: uinst.rd(),
+            imm: uinst.imm(),
+        }),
+        _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown U-Type instruction"),
+    }
 }
 
 pub fn decode_btype(inst: InstructionSize) -> Result<InstructionDecoded> {
     let binst = btype::BType::new(inst);
-    todo!()
+    match binst.funct3() {
+        beq::FUNCT3 => Ok(InstructionDecoded::Beq {
+            rs1: binst.rs1(),
+            rs2: binst.rs2(),
+            imm: binst.imm(),
+        }),
+        bne::FUNCT3 => Ok(InstructionDecoded::Bne {
+            rs1: binst.rs1(),
+            rs2: binst.rs2(),
+            imm: binst.imm(),
+        }),
+        blt::FUNCT3 => Ok(InstructionDecoded::Blt {
+            rs1: binst.rs1(),
+            rs2: binst.rs2(),
+            imm: binst.imm(),
+        }),
+        bge::FUNCT3 => Ok(InstructionDecoded::Bge {
+            rs1: binst.rs1(),
+            rs2: binst.rs2(),
+            imm: binst.imm(),
+        }),
+        bltu::FUNCT3 => Ok(InstructionDecoded::Bltu {
+            rs1: binst.rs1(),
+            rs2: binst.rs2(),
+            imm: binst.imm(),
+        }),
+        bgeu::FUNCT3 => Ok(InstructionDecoded::Bgeu {
+            rs1: binst.rs1(),
+            rs2: binst.rs2(),
+            imm: binst.imm(),
+        }),
+        _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown B-Type instruction"),
+    }
 }
 
 pub fn decode_jtype(inst: InstructionSize) -> Result<InstructionDecoded> {
     let jinst = jtype::JType::new(inst);
-    todo!()
+    match jinst.opcode() {
+        JAL_MATCH => Ok(InstructionDecoded::Jal {
+            rd: jinst.rd(),
+            imm: jinst.imm(),
+        }),
+        _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown J-Type instruction"),
+    }
 }
 
 pub fn try_decode(inst: InstructionSize) -> Result<InstructionDecoded> {
