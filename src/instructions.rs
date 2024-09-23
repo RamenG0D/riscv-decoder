@@ -1,32 +1,11 @@
+use instruction_creator::instructions;
+
 pub type InstructionSize = u32;
 pub type SignedInstructionSize = i32;
 
 // SHOULD ONLY BE USED TO GENERATE THE INSTRUCTION BASE / MASK (uses lots of const fn's and such to stay at comptime as much as possible)
 struct InstructionBuilder {
     inst: InstructionSize,
-}
-
-impl InstructionBuilder {
-    const fn builder() -> Self {
-        Self { inst: 0 }
-    }
-
-    const fn build(self) -> InstructionSize {
-        self.inst
-    }
-
-    const fn opcode(mut self, value: InstructionSize) -> Self {
-        self.inst |= value;
-        self
-    }
-    const fn funct3(mut self, value: InstructionSize) -> Self {
-        self.inst |= value << 12;
-        self
-    }
-    const fn funct7(mut self, value: InstructionSize) -> Self {
-        self.inst |= value << 25;
-        self
-    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -37,6 +16,155 @@ pub enum InstructionFormat {
     UType,
     BType,
     JType,
+}
+
+instructions! {
+    // register
+    add {
+        pub const FUNCT3: u32 = 0;
+        pub const FUNCT7: u32 = 0;
+    }
+    sub {
+        pub const FUNCT3: u32 = 0;
+        pub const FUNCT7: u32 = 32;
+    }
+    xor {
+        pub const FUNCT3: u32 = 4;
+        pub const FUNCT7: u32 = 0;
+    }
+    or {
+        pub const FUNCT3: u32 = 6;
+        pub const FUNCT7: u32 = 0;
+    }
+    and {
+        pub const FUNCT3: u32 = 7;
+        pub const FUNCT7: u32 = 0;
+    }
+    sll {
+        pub const FUNCT3: u32 = 1;
+        pub const FUNCT7: u32 = 0;
+    }
+    srl {
+        pub const FUNCT3: u32 = 5;
+        pub const FUNCT7: u32 = 0;
+    }
+    sra {
+        pub const FUNCT3: u32 = 5;
+        pub const FUNCT7: u32 = 32;
+    }
+    slt {
+        pub const FUNCT3: u32 = 2;
+        pub const FUNCT7: u32 = 0;
+    }
+    sltu {
+        pub const FUNCT3: u32 = 3;
+        pub const FUNCT7: u32 = 0;
+    }
+    // immediate
+    addi {
+        pub const FUNCT3: u32 = 0;
+        pub const FUNCT7: u32 = 0;
+    }
+    xori {
+        pub const FUNCT3: u32 = 4;
+    }
+    ori {
+        pub const FUNCT3: u32 = 6;
+    }
+    andi {
+        pub const FUNCT3: u32 = 7;
+    }
+    slli {
+        pub const FUNCT3: u32 = 1;
+        pub const IMM: u32 = 0;
+    }
+    srli {
+        pub const FUNCT3: u32 = 5;
+        pub const IMM: u32 = 0;
+    }
+    srai {
+        pub const FUNCT3: u32 = 5;
+        pub const IMM: u32 = 32;
+    }
+    slti {
+        pub const FUNCT3: u32 = 2;
+    }
+    sltiu {
+        pub const FUNCT3: u32 = 3;
+    }
+    jalr {
+        pub const FUNCT3: u32 = 0;
+    }
+    ecall {
+        pub const FUNCT3: u32 = 0;
+        pub const IMM: u32 = 0;
+    }
+    ebreak {
+        pub const FUNCT3: u32 = 0;
+        pub const IMM: u32 = 1;
+    }
+    // load
+    lb {
+        pub const FUNCT3: u32 = 0;
+    }
+    lh {
+        pub const FUNCT3: u32 = 1;
+    }
+    lw {
+        pub const FUNCT3: u32 = 2;
+    }
+    lbu {
+        pub const FUNCT3: u32 = 4;
+    }
+    lhu {
+        pub const FUNCT3: u32 = 5;
+    }
+    // store
+    sb {
+        pub const FUNCT3: u32 = 0;
+    }
+    sh {
+        pub const FUNCT3: u32 = 1;
+    }
+    sw {
+        pub const FUNCT3: u32 = 2;
+    }
+    // branch
+    beq {}
+    bne {}
+    blt {}
+    bge {}
+    bltu {}
+    bgeu {}
+    // jump
+    jal {
+        /* Nothing Here */
+    }
+    // csr
+    csrrw {}
+    csrrs {}
+    csrrc {}
+    csrrwi {}
+    csrrsi {}
+    csrrci {}
+    // fence
+    fence {}
+    fence_i {}
+    // atomic
+    lr_w {}
+    sc_w {}
+    amoswap_w {}
+    amoadd_w {}
+    amoxor_w {}
+    amoand_w {}
+    amoor_w {}
+    amomin_w {}
+    amomax_w {}
+    amominu_w {}
+    amomaxu_w {}
+    // utype
+    lui {}
+    auipc {}
 }
 
 pub mod compressed {
@@ -109,6 +237,7 @@ pub mod compressed {
         // TODO: Implement cs-type
     }
 }
+
 pub const LOAD_MATCH: InstructionSize = 3;
 pub const FENCE_MATCH: InstructionSize = 15;
 pub const ARITMETIC_IMMEDIATE_MATCH: InstructionSize = 19;
@@ -122,154 +251,9 @@ pub const JALR_MATCH: InstructionSize = 103;
 pub const JAL_MATCH: InstructionSize = 111;
 pub const ATOMIC_MATCH: InstructionSize = 47;
 
-macro_rules! instruction {
-    ($name:ident => $name_upper:ident($opcode:expr, $f3:expr, $f7:expr)[$ty:expr]) => {
-        pub mod $name {
-            use super::*;
-            pub const INST_BASE: InstructionSize = InstructionBuilder::builder()
-                .opcode(OPCODE)
-                .funct3(FUNCT3)
-                .funct7(FUNCT7)
-                .build();
-            pub const OPCODE: InstructionSize = $opcode;
-            pub const FUNCT3: InstructionSize = $f3;
-            pub const FUNCT7: InstructionSize = $f7;
-        }
-    };
-    ($name:ident => $name_upper:ident($opcode:expr, $f3:expr, $f7:expr)[$ty:expr] { $($b:tt)* }) => {
-        pub mod $name {
-            use super::*;
-            pub const INST_BASE: InstructionSize = InstructionBuilder::builder()
-                .opcode(OPCODE)
-                .funct3(FUNCT3)
-                .funct7(FUNCT7)
-                .build();
-            pub const OPCODE: InstructionSize = $opcode;
-            pub const FUNCT3: InstructionSize = $f3;
-            pub const FUNCT7: InstructionSize = $f7;
-
-            $($b)*
-        }
-    };
-}
-
-instruction!(lb => LB(LOAD_MATCH, 0, 0)[InstructionFormat::IType]);
-instruction!(lh => LH(LOAD_MATCH, 1, 0)[InstructionFormat::IType]);
-instruction!(lw => LW(LOAD_MATCH, 2, 0)[InstructionFormat::IType]);
-instruction!(lbu => LBU(LOAD_MATCH, 4, 0)[InstructionFormat::IType]);
-instruction!(lhu => LHU(LOAD_MATCH, 5, 0)[InstructionFormat::IType]);
-instruction!(addi => ADDI(ARITMETIC_IMMEDIATE_MATCH, 0, 0)[InstructionFormat::IType]);
-instruction!(slli => SLLI(ARITMETIC_IMMEDIATE_MATCH, 1, 0)[InstructionFormat::IType]);
-instruction!(slti => SLTI(ARITMETIC_IMMEDIATE_MATCH, 2, 0)[InstructionFormat::IType]);
-instruction!(sltiu => SLTIU(ARITMETIC_IMMEDIATE_MATCH, 3, 0)[InstructionFormat::IType]);
-instruction!(xori => XORI(ARITMETIC_IMMEDIATE_MATCH, 4, 0)[InstructionFormat::IType]);
-instruction!(srli => SRLI(ARITMETIC_IMMEDIATE_MATCH, 5, 0)[InstructionFormat::IType]);
-instruction!(srai => SRAI(ARITMETIC_IMMEDIATE_MATCH, 5, 32)[InstructionFormat::IType]);
-instruction!(ori => ORI(ARITMETIC_IMMEDIATE_MATCH, 6, 0)[InstructionFormat::IType]);
-instruction!(andi => ANDI(ARITMETIC_IMMEDIATE_MATCH, 7, 0)[InstructionFormat::IType]);
-instruction!(auipc => AUIPC(AUIPC_MATCH, 0, 0)[InstructionFormat::UType]);
-instruction!(sb => SB(STORE_MATCH, 0, 0)[InstructionFormat::SType]);
-instruction!(sh => SH(STORE_MATCH, 1, 0)[InstructionFormat::SType]);
-instruction!(sw => SW(STORE_MATCH, 2, 0)[InstructionFormat::SType]);
-instruction!(add => ADD(ARITMETIC_REGISTER_MATCH, 0, 0)[InstructionFormat::RType]);
-instruction!(sub => SUB(ARITMETIC_REGISTER_MATCH, 0, 32)[InstructionFormat::RType]);
-instruction!(sll => SLL(ARITMETIC_REGISTER_MATCH, 1, 0)[InstructionFormat::RType]);
-instruction!(slt => SLT(ARITMETIC_REGISTER_MATCH, 2, 0)[InstructionFormat::RType]);
-instruction!(sltu => SLTU(ARITMETIC_REGISTER_MATCH, 3, 0)[InstructionFormat::RType]);
-instruction!(xor => XOR(ARITMETIC_REGISTER_MATCH, 4, 0)[InstructionFormat::RType]);
-instruction!(srl => SRL(ARITMETIC_REGISTER_MATCH, 5, 0)[InstructionFormat::RType]);
-instruction!(sra => SRA(ARITMETIC_REGISTER_MATCH, 5, 32)[InstructionFormat::RType]);
-instruction!(or => OR(ARITMETIC_REGISTER_MATCH, 6, 0)[InstructionFormat::RType]);
-instruction!(and => AND(ARITMETIC_REGISTER_MATCH, 7, 0)[InstructionFormat::RType]);
-instruction!(lui => LUI(LUI_MATCH, 0, 0)[InstructionFormat::UType]);
-instruction!(addw => ADDW(ARITMETIC_REGISTER_MATCH, 0, 0)[InstructionFormat::RType]);
-instruction!(subw => SUBW(ARITMETIC_REGISTER_MATCH, 0, 32)[InstructionFormat::RType]);
-instruction!(sllw => SLLW(ARITMETIC_REGISTER_MATCH, 1, 0)[InstructionFormat::RType]);
-instruction!(srlw => SRLW(ARITMETIC_REGISTER_MATCH, 5, 0)[InstructionFormat::RType]);
-instruction!(sraw => SRAW(ARITMETIC_REGISTER_MATCH, 5, 32)[InstructionFormat::RType]);
-instruction!(beq => BEQ(BRANCH_MATCH, 0, 0)[InstructionFormat::SType]);
-instruction!(bne => BNE(BRANCH_MATCH, 1, 0)[InstructionFormat::SType]);
-instruction!(blt => BLT(BRANCH_MATCH, 4, 0)[InstructionFormat::SType]);
-instruction!(bge => BGE(BRANCH_MATCH, 5, 0)[InstructionFormat::SType]);
-instruction!(bltu => BLTU(BRANCH_MATCH, 6, 0)[InstructionFormat::SType]);
-instruction!(bgeu => BGEU(BRANCH_MATCH, 7, 0)[InstructionFormat::SType]);
-instruction!(jalr => JALR(JALR_MATCH, 0, 0)[InstructionFormat::IType]);
-instruction!(jal => JAL(JAL_MATCH, 0, 0)[InstructionFormat::JType]);
-
-instruction!(ecall => ECALL(CSR_MATCH, 0, 0)[InstructionFormat::IType]);
-instruction!(ebreak => EBREAK(CSR_MATCH, 0, 1)[InstructionFormat::IType]);
-/* Why couldnt i find this in the RiscV ISA? ID```F*CKIN```K! */
-instruction!(sret => SRET(CSR_MATCH, 0, 2)[InstructionFormat::IType]);
-instruction!(mret => MRET(CSR_MATCH, 0, 3)[InstructionFormat::IType]);
-instruction!(sfence_vma => SFENCE_VMA(CSR_MATCH, 0, 9)[InstructionFormat::IType]);
-
-instruction!(csrrw => CSRRW(CSR_MATCH, 1, 0)[InstructionFormat::IType]);
-instruction!(csrrs => CSRRS(CSR_MATCH, 2, 0)[InstructionFormat::IType]);
-instruction!(csrrc => CSRRC(CSR_MATCH, 3, 0)[InstructionFormat::IType]);
-instruction!(csrrwi => CSRRWI(CSR_MATCH, 5, 0)[InstructionFormat::IType]);
-instruction!(csrrsi => CSRRSI(CSR_MATCH, 6, 0)[InstructionFormat::IType]);
-instruction!(csrrci => CSRRCI(CSR_MATCH, 7, 0)[InstructionFormat::IType]);
-
-instruction!(fence => FENCE(FENCE_MATCH, 0, 0)[InstructionFormat::IType]);
-instruction!(fence_i => FENCE_I(FENCE_MATCH, 1, 0)[InstructionFormat::IType]);
-
-// D Extension
-instruction!(flw => FLW(LOAD_MATCH, 2, 2)[InstructionFormat::IType]);
-instruction!(fld => FLD(LOAD_MATCH, 3, 3)[InstructionFormat::IType]);
-instruction!(fsw => FSW(STORE_MATCH, 2, 2)[InstructionFormat::SType]);
-instruction!(fsd => FSD(STORE_MATCH, 3, 3)[InstructionFormat::SType]);
-instruction!(fmadd_s => FMADD_S(ARITMETIC_REGISTER_MATCH, 0, 0)[InstructionFormat::RType]);
-instruction!(fmsub_s => FMSUB_S(ARITMETIC_REGISTER_MATCH, 0, 1)[InstructionFormat::RType]);
-instruction!(fnmsub_s => FNMSUB_S(ARITMETIC_REGISTER_MATCH, 0, 2)[InstructionFormat::RType]);
-instruction!(fnmadd_s => FNMADD_S(ARITMETIC_REGISTER_MATCH, 0, 3)[InstructionFormat::RType]);
-instruction!(fadd_s => FADD_S(ARITMETIC_REGISTER_MATCH, 0, 0)[InstructionFormat::RType]);
-instruction!(fsub_s => FSUB_S(ARITMETIC_REGISTER_MATCH, 0, 1)[InstructionFormat::RType]);
-instruction!(fmul_s => FMUL_S(ARITMETIC_REGISTER_MATCH, 0, 2)[InstructionFormat::RType]);
-instruction!(fdiv_s => FDIV_S(ARITMETIC_REGISTER_MATCH, 0, 3)[InstructionFormat::RType]);
-instruction!(fsqrt_s => FSQRT_S(ARITMETIC_REGISTER_MATCH, 0, 4)[InstructionFormat::RType]);
-instruction!(fsgnj_s => FSGNJ_S(ARITMETIC_REGISTER_MATCH, 0, 5)[InstructionFormat::RType]);
-instruction!(fsgnjn_s => FSGNJN_S(ARITMETIC_REGISTER_MATCH, 0, 6)[InstructionFormat::RType]);
-instruction!(fsgnjx_s => FSGNJX_S(ARITMETIC_REGISTER_MATCH, 0, 7)[InstructionFormat::RType]);
-instruction!(fmin_s => FMIN_S(ARITMETIC_REGISTER_MATCH, 0, 8)[InstructionFormat::RType]);
-instruction!(fmax_s => FMAX_S(ARITMETIC_REGISTER_MATCH, 0, 9)[InstructionFormat::RType]);
-instruction!(fcvt_w_s => FCVT_W_S(ARITMETIC_REGISTER_MATCH, 0, 10)[InstructionFormat::RType]);
-instruction!(fcvt_wu_s => FCVT_WU_S(ARITMETIC_REGISTER_MATCH, 0, 11)[InstructionFormat::RType]);
-instruction!(fmv_x_w => FMV_X_W(ARITMETIC_REGISTER_MATCH, 0, 12)[InstructionFormat::RType]);
-instruction!(feq_s => FEQ_S(ARITMETIC_REGISTER_MATCH, 0, 13)[InstructionFormat::RType]);
-instruction!(flt_s => FLT_S(ARITMETIC_REGISTER_MATCH, 0, 14)[InstructionFormat::RType]);
-instruction!(fle_s => FLE_S(ARITMETIC_REGISTER_MATCH, 0, 15)[InstructionFormat::RType]);
-instruction!(fclass_s => FCLASS(ARITMETIC_REGISTER_MATCH, 0, 16)[InstructionFormat::RType]);
-
-// M Extension
-instruction!(mul => MUL(ARITMETIC_REGISTER_MATCH, 0, 1)[InstructionFormat::RType]);
-instruction!(mulh => MULH(ARITMETIC_REGISTER_MATCH, 1, 1)[InstructionFormat::RType]);
-instruction!(mulsu => MULSU(ARITMETIC_REGISTER_MATCH, 2, 1)[InstructionFormat::RType]);
-instruction!(mulu => MULU(ARITMETIC_REGISTER_MATCH, 3, 1)[InstructionFormat::RType]);
-instruction!(div => DIV(ARITMETIC_REGISTER_MATCH, 4, 1)[InstructionFormat::RType]);
-instruction!(divu => DIVU(ARITMETIC_REGISTER_MATCH, 5, 1)[InstructionFormat::RType]);
-instruction!(rem => REM(ARITMETIC_REGISTER_MATCH, 6, 1)[InstructionFormat::RType]);
-instruction!(remu => REMU(ARITMETIC_REGISTER_MATCH, 7, 1)[InstructionFormat::RType]);
-
-// A Extension
-instruction!(lrw => LRW(ARITMETIC_REGISTER_MATCH, 2, 8 /* its 8(0b0001000) b/c its the funct7 value rsht by 2 (first 2 bits are the rl, and aq) */)[InstructionFormat::RType] {
-    pub const FUNCT5: InstructionSize = FUNCT7 >> 2;
-});
-instruction!(scw => SCW(ARITMETIC_REGISTER_MATCH, 2, 12)[InstructionFormat::RType] {
-    pub const FUNCT5: InstructionSize = FUNCT7 >> 2;
-});
-instruction!(amoswapw => AMOSWAPW(ARITMETIC_REGISTER_MATCH, 2, 4)[InstructionFormat::RType] {
-    pub const FUNCT5: InstructionSize = FUNCT7 >> 2;
-});
-instruction!(amoaddw => AMOADDW(ARITMETIC_REGISTER_MATCH, 2, 0)[InstructionFormat::RType] {
-    pub const FUNCT5: InstructionSize = FUNCT7 >> 2;
-});
-instruction!(amoxorw => AMOXORW(ARITMETIC_REGISTER_MATCH, 2, 6)[InstructionFormat::RType] {
-    pub const FUNCT5: InstructionSize = FUNCT7 >> 2;
-});
-
 pub mod rtype {
-    use bitfield::bitfield;
     use super::InstructionSize;
+    use bitfield::bitfield;
 
     bitfield! {
         pub struct RType(InstructionSize);
@@ -390,6 +374,13 @@ pub mod utype {
             Self(inst)
         }
     }
+
+    #[test]
+    pub fn imm_check() {
+        let inst = UType(0x00004537 /* lui x10, 4 */);
+        assert_eq!(inst.rd(), 10);
+        assert_eq!(inst.imm1(), 4);
+    }
 }
 
 // aims to mimic `mm[12|10:5] rs2 rs1 funct3 imm[4:1|11] opcode B-type` in the RISC-V spec
@@ -475,7 +466,7 @@ pub mod jtype {
                 self.imm1(), // imm[20]
                 self.imm2(), // imm[19:12]
                 self.imm3(), // imm[11]
-                self.imm4() // imm[10:1]
+                self.imm4(), // imm[10:1]
             );
             imm1 | imm2 | imm3 | imm4
         }
@@ -486,7 +477,9 @@ pub mod jtype {
         let inst = JType(0x0100006f /* jal x0 16 */);
         assert_eq!(inst.rd(), 0);
         assert_eq!(inst.imm(), 16);
-        let inst = JType(0x84000EF /* JAL ra 132 (0b00001000010000000000000011101111) */);
+        let inst = JType(
+            0x84000EF, /* JAL ra 132 (0b00001000010000000000000011101111) */
+        );
         assert_eq!(inst.rd(), 1);
         assert_eq!(inst.imm(), 132);
         let inst = JType(0xfb9ff0ef /* jal ra, -72 */);

@@ -4,5 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+anyhow = "1.0.89"
 bit_ops = "0.1.13"
 bitfield = "0.17.0"
+
+[dependencies.instruction-creator]
+path = "instruction-creator"
+version = "*"
