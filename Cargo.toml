@@ -1,6 +1,6 @@
 [package]
 name = "riscv-decoder"
-version = "0.1.0"
+version = "0.1.2"
 edition = "2021"
 
 [dependencies]
@@ -10,4 +10,4 @@ bitfield = "0.17.0"
 
 [dependencies.instruction-creator]
 path = "instruction-creator"
-version = "0.1.2"
+version = "0.1.0"
