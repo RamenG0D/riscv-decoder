@@ -132,20 +132,20 @@ pub fn decode_itype(inst: InstructionSize) -> Result<InstructionDecoded> {
             rs1: iinst.rs1(),
             imm: iinst.imm(),
         }),
-        (ARITMETIC_IMMEDIATE_MATCH, slli::FUNCT3, slli::IMM) => Ok(InstructionDecoded::Slli {
+        imm @ (ARITMETIC_IMMEDIATE_MATCH, slli::FUNCT3, _) if (imm.2 >> 5) == slli::IMM => Ok(InstructionDecoded::Slli {
             rd: iinst.rd(),
             rs1: iinst.rs1(),
-            imm: iinst.imm(),
+            imm: imm.2 & 0b11111,
         }),
-        (ARITMETIC_IMMEDIATE_MATCH, srli::FUNCT3, srli::IMM) => Ok(InstructionDecoded::Srli {
+        imm @ (ARITMETIC_IMMEDIATE_MATCH, srli::FUNCT3, _) if (imm.2 >> 5) == srli::IMM => Ok(InstructionDecoded::Srli {
             rd: iinst.rd(),
             rs1: iinst.rs1(),
-            imm: iinst.imm(),
+            imm: imm.2 & 0b11111,
         }),
-        (ARITMETIC_IMMEDIATE_MATCH, srai::FUNCT3, srai::IMM) => Ok(InstructionDecoded::Srai {
+        imm @ (ARITMETIC_IMMEDIATE_MATCH, srai::FUNCT3, _) if (imm.2 >> 5) == srai::IMM => Ok(InstructionDecoded::Srai {
             rd: iinst.rd(),
             rs1: iinst.rs1(),
-            imm: iinst.imm(),
+            imm: imm.2 & 0b11111,
         }),
         // Load
         (LOAD_MATCH, lb::FUNCT3, _) => Ok(InstructionDecoded::Lb {

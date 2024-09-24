@@ -399,6 +399,17 @@ pub mod itype {
         assert_eq!(inst.rd(), 1);
         assert_eq!(inst.rs1(), 1);
         assert_eq!(inst.imm(), 12);
+        let inst = IType(0x379793 /* slli a5, a5, 3 */);
+        assert_eq!(inst.rd(), 15);
+        assert_eq!(inst.rs1(), 15);
+        assert_eq!(inst.imm(), 3);
+        use crate::{decoded_inst::InstructionDecoded, decoder::try_decode};
+        let inst = try_decode(0x379793 /* slli a5, a5, 3 */).unwrap();
+        assert!(matches!(inst, InstructionDecoded::Slli {
+            rd: 15,
+            rs1: 15,
+            imm: 3
+        }));
     }
 }
 
