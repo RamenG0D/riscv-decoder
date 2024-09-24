@@ -456,6 +456,10 @@ pub mod btype {
         assert_eq!(inst.rs1(), 15);
         assert_eq!(inst.rs2(), 0);
         assert_eq!(inst.imm() as SignedInstructionSize, -8);
+        let inst = BType(0xfe20dae3 /* bge x1 x2 -12 */);
+        assert_eq!(inst.rs1(), 1);
+        assert_eq!(inst.rs2(), 2);
+        assert_eq!(inst.imm() as SignedInstructionSize, -12);
     }
 }
 
