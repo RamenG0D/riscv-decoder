@@ -153,12 +153,24 @@ instructions! {
     // jump
     jal { /* Nothing Here */ }
     // csr
-    csrrw {}
-    csrrs {}
-    csrrc {}
-    csrrwi {}
-    csrrsi {}
-    csrrci {}
+    csrrw {
+        pub const FUNCT3: u32 = 1;
+    }
+    csrrs {
+        pub const FUNCT3: u32 = 2;
+    }
+    csrrc {
+        pub const FUNCT3: u32 = 3;
+    }
+    csrrwi {
+        pub const FUNCT3: u32 = 5;
+    }
+    csrrsi {
+        pub const FUNCT3: u32 = 6;
+    }
+    csrrci {
+        pub const FUNCT3: u32 = 7;
+    }
     // fence
     fence {
         pub const FUNCT3: u32 = 0;
@@ -301,8 +313,9 @@ pub mod itype {
         pub rd, _:     11, 7;
         pub funct3, _: 14, 12;
         pub rs1, _:    19, 15;
+        imm_unsigned, _:   31, 20;
         SignedInstructionSize;
-        pub imm1, _:   31, 20;
+        imm_signed, _:   31, 20;
     }
 
     impl IType {
@@ -311,8 +324,24 @@ pub mod itype {
         }
 
         pub fn imm(&self) -> InstructionSize {
-            self.imm1() as InstructionSize
+            self.imm_signed() as InstructionSize
         }
+
+        pub fn uimm(&self) -> InstructionSize {
+            self.imm_unsigned()
+        }
+    }
+
+    #[test]
+    fn csr_check() {
+        let inst = IType(0xf14025f3 /* csrrs x11, mhartid, x0 */);
+        assert_eq!(inst.rd(), 11);
+        assert_eq!(inst.rs1(), 0);
+        assert_eq!(inst.uimm(), 3860);
+        let inst = IType(0x30101773 /* csrrw x14, misa, x0 */);
+        assert_eq!(inst.rd(), 14);
+        assert_eq!(inst.rs1(), 0);
+        assert_eq!(inst.uimm(), 769);
     }
 
     #[test]
@@ -320,7 +349,7 @@ pub mod itype {
         let inst = IType(0x06468613 /* addi x12 x13 100 */);
         assert_eq!(inst.rd(), 12);
         assert_eq!(inst.rs1(), 13);
-        assert_eq!(inst.imm1(), 100);
+        assert_eq!(inst.imm(), 100);
     }
 
     #[test]
@@ -328,15 +357,15 @@ pub mod itype {
         let inst = IType(0x00411573 /* csrrw x10 x2 4 */);
         assert_eq!(inst.rd(), 10);
         assert_eq!(inst.rs1(), 2);
-        assert_eq!(inst.imm1(), 4);
+        assert_eq!(inst.imm(), 4);
         let inst = IType(0x00c12603 /* lw x12, 12(sp) */);
         assert_eq!(inst.rd(), 12);
         assert_eq!(inst.rs1(), 2);
-        assert_eq!(inst.imm1(), 12);
+        assert_eq!(inst.imm(), 12);
         let inst = IType(0x00c080e7 /* jalr x1, 12(ra) */);
         assert_eq!(inst.rd(), 1);
         assert_eq!(inst.rs1(), 1);
-        assert_eq!(inst.imm1(), 12);
+        assert_eq!(inst.imm(), 12);
     }
 }
 
