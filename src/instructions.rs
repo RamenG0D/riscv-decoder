@@ -416,13 +416,14 @@ pub mod btype {
         pub struct BType(InstructionSize);
         impl Debug;
         pub opcode, _: 6, 0;
-        pub imm1, _:   11, 7;
-        InstructionSize;
+        pub imm1, _:   7, 7;
+        pub imm2, _:   11, 8;
         pub funct3, _: 14, 12;
         pub rs1, _:    19, 15;
         pub rs2, _:    24, 20;
+        pub imm3, _:   30, 25;
         SignedInstructionSize;
-        pub imm2, _:   31, 25;
+        pub imm4, _:   31, 31;
     }
 
     impl BType {
@@ -431,7 +432,13 @@ pub mod btype {
         }
 
         pub fn imm(&self) -> InstructionSize {
-            self.imm1() | (self.imm2() << 5) as InstructionSize
+            let (imm1, imm2, imm3, imm4) = (
+                self.imm1() << 11,
+                self.imm2() << 1,
+                self.imm3() << 5,
+                self.imm4() << 12,
+            );
+            imm1 | imm2 | imm3 | imm4 as InstructionSize
         }
     }
 
@@ -445,6 +452,10 @@ pub mod btype {
         assert_eq!(inst.rs1(), 1);
         assert_eq!(inst.rs2(), 4);
         assert_eq!(inst.imm(), 12);
+        let inst = BType(0xfe078ce3 /* beq x15, x0, -8 */);
+        assert_eq!(inst.rs1(), 15);
+        assert_eq!(inst.rs2(), 0);
+        assert_eq!(inst.imm() as SignedInstructionSize, -8);
     }
 }
 
