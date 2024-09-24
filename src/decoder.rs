@@ -54,6 +54,47 @@ pub fn decode_rtype(inst: InstructionSize) -> Result<InstructionDecoded> {
             rs1: inst.rs1(),
             rs2: inst.rs2(),
         }),
+        // Mul/div
+        (ARITMETIC_REGISTER_MATCH, mul::FUNCT3, mul::FUNCT7) => Ok(InstructionDecoded::Mul {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (ARITMETIC_REGISTER_MATCH, mulh::FUNCT3, mulh::FUNCT7) => Ok(InstructionDecoded::Mulh {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (ARITMETIC_REGISTER_MATCH, mulsu::FUNCT3, mulsu::FUNCT7) => Ok(InstructionDecoded::Mulsu {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (ARITMETIC_REGISTER_MATCH, mulu::FUNCT3, mulu::FUNCT7) => Ok(InstructionDecoded::Mulu {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (ARITMETIC_REGISTER_MATCH, div::FUNCT3, div::FUNCT7) => Ok(InstructionDecoded::Div {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (ARITMETIC_REGISTER_MATCH, divu::FUNCT3, divu::FUNCT7) => Ok(InstructionDecoded::Divu {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (ARITMETIC_REGISTER_MATCH, rem::FUNCT3, rem::FUNCT7) => Ok(InstructionDecoded::Rem {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (ARITMETIC_REGISTER_MATCH, remu::FUNCT3, remu::FUNCT7) => Ok(InstructionDecoded::Remu {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
         _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown R-Type instruction"),
     }
 }
@@ -106,6 +147,7 @@ pub fn decode_itype(inst: InstructionSize) -> Result<InstructionDecoded> {
             rs1: iinst.rs1(),
             imm: iinst.imm(),
         }),
+        // Load
         (LOAD_MATCH, lb::FUNCT3, _) => Ok(InstructionDecoded::Lb {
             rd: iinst.rd(),
             rs1: iinst.rs1(),

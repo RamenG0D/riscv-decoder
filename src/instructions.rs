@@ -97,6 +97,39 @@ instructions! {
         pub const FUNCT3: u32 = 0;
         pub const IMM: u32 = 1;
     }
+    // M type
+    mul {
+        pub const FUNCT3: u32 = 0;
+        pub const FUNCT7: u32 = 1;
+    }
+    mulh {
+        pub const FUNCT3: u32 = 1;
+        pub const FUNCT7: u32 = 1;
+    }
+    mulsu {
+        pub const FUNCT3: u32 = 2;
+        pub const FUNCT7: u32 = 1;
+    }
+    mulu {
+        pub const FUNCT3: u32 = 3;
+        pub const FUNCT7: u32 = 1;
+    }
+    div {
+        pub const FUNCT3: u32 = 4;
+        pub const FUNCT7: u32 = 1;
+    }
+    divu {
+        pub const FUNCT3: u32 = 5;
+        pub const FUNCT7: u32 = 1;
+    }
+    rem {
+        pub const FUNCT3: u32 = 6;
+        pub const FUNCT7: u32 = 1;
+    }
+    remu {
+        pub const FUNCT3: u32 = 7;
+        pub const FUNCT7: u32 = 1;
+    }
     // load
     lb {
         pub const FUNCT3: u32 = 0;
