@@ -337,5 +337,5 @@ pub fn try_decode(inst: InstructionSize) -> Result<InstructionDecoded> {
 }
 
 pub fn try_decode_compressed(inst: InstructionSize) -> Result<InstructionDecoded> {
-    Err(DecodeError::UnknownInstructionFormat).context(format!("Compressed instructions are not supported yet inst( {inst} )"))
+    Err(DecodeError::UnknownInstructionFormat).context(format!("Compressed instructions are not supported yet"))
 }
