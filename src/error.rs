@@ -1,16 +1,15 @@
-#[derive(Debug, Clone, PartialEq, Eq)]
+use std::fmt::{Display, Formatter, Result};
+
+use thiserror::Error;
+
+#[derive(Error, Debug, Clone, PartialEq, Eq)]
 pub enum DecodeError {
     UnknownInstruction,
     UnknownInstructionFormat,
 }
 
-impl std::fmt::Display for DecodeError {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self {
-            DecodeError::UnknownInstruction => write!(f, "Unknown instruction"),
-            DecodeError::UnknownInstructionFormat => write!(f, "Unknown instruction format"),
-        }
+impl Display for DecodeError {
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        write!(f, "{:?}", self)
     }
 }
-
-impl std::error::Error for DecodeError {}
