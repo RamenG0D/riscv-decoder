@@ -1,6 +1,10 @@
 use crate::{decoded_inst::InstructionDecoded, error::DecodeError, instructions::*};
 use anyhow::{Context, Result};
 
+const OPCODE_MASK: InstructionSize = crate::bit_ops::create_mask(7);
+// basically the opcode mask but for a compressed instruction (a compresed inst's opcode is the first 2 bits)
+const COMPRESSED_MASK: InstructionSize = crate::bit_ops::create_mask(2);
+
 pub fn decode_rtype(inst: InstructionSize) -> Result<InstructionDecoded> {
     let inst = rtype::RType::new(inst);
     match (inst.opcode(), inst.funct3(), inst.funct7()) {
@@ -300,7 +304,13 @@ pub fn decode_jtype(inst: InstructionSize) -> Result<InstructionDecoded> {
 }
 
 pub fn try_decode(inst: InstructionSize) -> Result<InstructionDecoded> {
-    const OPCODE_MASK: InstructionSize = 0b1111111;
+    // if its a compressed inst then dont bother with regular decoding, instead decode it as compressed and return the result
+    match inst & COMPRESSED_MASK {
+        // its a compressed instruction
+        0 | 1 | 2 => return try_decode_compressed(inst),
+        // otherwise just continue with regular decoding
+        _ => (),
+    }
 
     let fmt = match inst & OPCODE_MASK {
         ARITMETIC_REGISTER_MATCH => InstructionFormat::RType,
@@ -311,9 +321,7 @@ pub fn try_decode(inst: InstructionSize) -> Result<InstructionDecoded> {
             InstructionFormat::IType
         }
         LUI_MATCH | AUIPC_MATCH => InstructionFormat::UType,
-        // TODO: Support compressed instructions
-        // inst if is_compressed(inst) => InstructionFormat::Compressed,
-        _ => Err(DecodeError::UnknownInstructionFormat)?,
+        _ => Err(DecodeError::UnknownInstructionFormat).context(format!("Failed to decode inst {inst}"))?,
     };
 
     let inst = match fmt {
@@ -323,8 +331,6 @@ pub fn try_decode(inst: InstructionSize) -> Result<InstructionDecoded> {
         InstructionFormat::UType => decode_utype(inst)?,
         InstructionFormat::BType => decode_btype(inst)?,
         InstructionFormat::JType => decode_jtype(inst)?,
-        // TODO: Support compressed instructions
-        // InstructionFormat::Compressed => decode_compressed(inst)?,
     };
 
     Ok(inst)
