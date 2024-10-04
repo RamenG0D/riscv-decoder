@@ -214,6 +214,9 @@ pub fn decode_itype(inst: InstructionSize) -> Result<InstructionDecoded> {
             rs1: iinst.rs1(),
             imm: iinst.uimm(),
         }),
+        // e-insts (ebreak, ecall)
+        (CSR_MATCH, ebreak::FUNCT3, ebreak::IMM) => Ok(InstructionDecoded::EBreak),
+        (CSR_MATCH, ecall::FUNCT3, ecall::IMM) => Ok(InstructionDecoded::ECall),
         _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown I-Type instruction"),
     }
 }
