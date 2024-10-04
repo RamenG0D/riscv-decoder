@@ -756,14 +756,10 @@ impl Display for InstructionDecoded {
                     (false, true) => format!("{}({})", REG_NAMES[*rd as usize], *imm as i32),
                     (false, false) => format!("{}, {}({})", REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], *imm as i32),
                 };
-                write!(
-                    f,
-                    "jalr {}",
-                    args
-                )
+                write!(f, "jalr {args}")
             }
             InstructionDecoded::Jal { rd, imm } => {
-                write!(f, "jal {}, {}", REG_NAMES[*rd as usize], *imm as i32)
+                write!(f, "jal {}({})", REG_NAMES[*rd as usize], *imm as i32)
             }
             InstructionDecoded::ECall => {
                 write!(f, "ecall")
