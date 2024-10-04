@@ -493,6 +493,9 @@ pub enum InstructionDecoded {
     },
 }
 
+// generates comptime map for large amount of csr mapping their names to their values
+include!(concat!(env!("OUT_DIR"), "/codegen.rs"));
+
 impl Display for InstructionDecoded {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         const REG_NAMES: [&str; 32] = [
@@ -775,42 +778,42 @@ impl Display for InstructionDecoded {
                 write!(
                     f,
                     "csrrw {}, {}, {}",
-                    REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], *imm as i32
+                    REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], CSRS.get(imm).map(|v| *v).unwrap_or(format!("{imm}").as_str())
                 )
             }
             InstructionDecoded::CsrRs { rd, rs1, imm } => {
                 write!(
                     f,
                     "csrrs {}, {}, {}",
-                    REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], *imm as i32
+                    REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], CSRS.get(imm).map(|v| *v).unwrap_or(format!("{imm}").as_str())
                 )
             }
             InstructionDecoded::CsrRc { rd, rs1, imm } => {
                 write!(
                     f,
                     "csrrc {}, {}, {}",
-                    REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], *imm as i32
+                    REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], CSRS.get(imm).map(|v| *v).unwrap_or(format!("{imm}").as_str())
                 )
             }
             InstructionDecoded::CsrRwi { rd, rs1, imm } => {
                 write!(
                     f,
                     "csrrwi {}, {}, {}",
-                    REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], *imm as i32
+                    REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], CSRS.get(imm).map(|v| *v).unwrap_or(format!("{imm}").as_str())
                 )
             }
             InstructionDecoded::CsrRsi { rd, rs1, imm } => {
                 write!(
                     f,
                     "csrrsi {}, {}, {}",
-                    REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], *imm as i32
+                    REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], CSRS.get(imm).map(|v| *v).unwrap_or(format!("{imm}").as_str())
                 )
             }
             InstructionDecoded::CsrRci { rd, rs1, imm } => {
                 write!(
                     f,
                     "csrrci {}, {}, {}",
-                    REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], *imm as i32
+                    REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], CSRS.get(imm).map(|v| *v).unwrap_or(format!("{imm}").as_str())
                 )
             }
             InstructionDecoded::Fence {
