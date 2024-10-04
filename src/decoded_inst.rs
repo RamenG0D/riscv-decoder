@@ -750,10 +750,16 @@ impl Display for InstructionDecoded {
                 )
             }
             InstructionDecoded::Jalr { rd, rs1, imm } => {
+                let args = match (*imm as i32 == 0, rd == rs1) {
+                    (true, true) => format!("{}", REG_NAMES[*rd as usize]),
+                    (true, false) => format!("{}, {}", REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize]),
+                    (false, true) => format!("{}({})", REG_NAMES[*rd as usize], *imm as i32),
+                    (false, false) => format!("{}, {}({})", REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], *imm as i32),
+                };
                 write!(
                     f,
-                    "jalr {}, {}, {}",
-                    REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], *imm as i32
+                    "jalr {}",
+                    args
                 )
             }
             InstructionDecoded::Jal { rd, imm } => {
