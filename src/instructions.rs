@@ -428,6 +428,10 @@ pub mod itype {
             rs1: 15,
             imm: 3
         }));
+        let inst = IType(0x00197793 /* andi a5, s2, 1 */);
+        assert_eq!(inst.rd(), 15);
+        assert_eq!(inst.rs1(), 18);
+        assert_eq!(inst.imm(), 1);
     }
 }
 
@@ -476,8 +480,8 @@ pub mod utype {
         impl Debug;
         pub opcode, _: 6, 0;
         pub rd, _:     11, 7;
-        SignedInstructionSize;
-        pub imm1, _:   31, 12;
+        // SignedInstructionSize;
+        pub imm, _:   31, 12;
     }
 
     impl UType {
@@ -485,16 +489,16 @@ pub mod utype {
             Self(inst)
         }
 
-        pub fn imm(&self) -> InstructionSize {
-            self.imm1() as InstructionSize
-        }
+        // pub fn imm(&self) -> InstructionSize {
+        //     self.imm1() as InstructionSize
+        // }
     }
 
     #[test]
     pub fn imm_check() {
         let inst = UType(0x00004537 /* lui x10, 4 */);
         assert_eq!(inst.rd(), 10);
-        assert_eq!(inst.imm1(), 4);
+        assert_eq!(inst.imm(), 4);
     }
 }
 
