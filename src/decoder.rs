@@ -217,6 +217,10 @@ pub fn decode_itype(inst: InstructionSize) -> Result<InstructionDecoded> {
         // e-insts (ebreak, ecall)
         (CSR_MATCH, ebreak::FUNCT3, ebreak::IMM) => Ok(InstructionDecoded::EBreak),
         (CSR_MATCH, ecall::FUNCT3, ecall::IMM) => Ok(InstructionDecoded::ECall),
+        (CSR_MATCH, mret::FUNCT3, mret::IMM) => Ok(InstructionDecoded::MRet),
+        (CSR_MATCH, sret::FUNCT3, sret::IMM) => Ok(InstructionDecoded::SRet),
+        // TODO: SFenceVMA
+        // (CSR_MATCH, sfencevma::FUNCT3, sfencevma::IMM) => Ok(InstructionDecoded::SFenceVma),
         _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown I-Type instruction"),
     }
 }

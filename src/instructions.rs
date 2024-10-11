@@ -89,6 +89,7 @@ instructions! {
     jalr {
         pub const FUNCT3: u32 = 0;
     }
+    // control
     ecall {
         pub const FUNCT3: u32 = 0;
         pub const IMM: u32 = 0;
@@ -97,6 +98,19 @@ instructions! {
         pub const FUNCT3: u32 = 0;
         pub const IMM: u32 = 1;
     }
+    mret {
+        pub const FUNCT3: u32 = 0;
+        pub const IMM: u32 = 0x302;
+    }
+    sret {
+        pub const FUNCT3: u32 = 0;
+        pub const IMM: u32 = 0x102;
+    }
+    // TODO: Figure out what sfencevma is????
+    /*sfencevma {
+        pub const FUNCT3: u32 = ;
+        pub const IMM: u32 = ;
+    }*/
     // M type
     mul {
         pub const FUNCT3: u32 = 0;
@@ -375,6 +389,10 @@ pub mod itype {
         assert_eq!(inst.rd(), 14);
         assert_eq!(inst.rs1(), 0);
         assert_eq!(inst.uimm(), 769);
+        let inst = IType(0xc0006073 /* csrrsi _, _, _ */);
+        assert_eq!(inst.rd(), 0);
+        assert_eq!(inst.rs1(), 0);
+        assert_eq!(inst.uimm(), 0b1100_0000_0000);
     }
 
     #[test]
