@@ -705,7 +705,7 @@ impl Display for InstructionDecoded {
                 )
             }
             InstructionDecoded::Lui { rd, imm } => {
-                write!(f, "lui {}, {}", REG_NAMES[*rd as usize], *imm)
+                write!(f, "lui {}, {:#X}", REG_NAMES[*rd as usize], *imm)
             }
             InstructionDecoded::Beq { rs1, rs2, imm } => {
                 write!(
