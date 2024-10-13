@@ -1,5 +1,6 @@
 use crate::{decoded_inst::InstructionDecoded, error::DecodeError, instructions::*};
 use anyhow::{Context, Result};
+use crate::bit_ops::get_bits;
 
 const OPCODE_MASK: InstructionSize = crate::bit_ops::create_mask(7);
 // basically the opcode mask but for a compressed instruction (a compresed inst's opcode is the first 2 bits)
@@ -182,8 +183,16 @@ pub fn decode_itype(inst: InstructionSize) -> Result<InstructionDecoded> {
             rs1: iinst.rs1(),
             imm: iinst.imm(),
         }),
-        (FENCE_MATCH, fence::FUNCT3, _) => todo!(),
-        (FENCE_MATCH, fence_i::FUNCT3, _) => todo!(),
+        (FENCE_MATCH, fence::FUNCT3, _) => {
+            let pred = iinst.imm() & 0b1111;
+            let succ = (iinst.imm() >> 4) & 0b1111;
+            Ok(InstructionDecoded::Fence { pred, succ })
+        }
+        (FENCE_MATCH, fence_i::FUNCT3, _) => {
+            let pred = get_bits(iinst.imm(), 4, 0);
+            let succ = get_bits(iinst.imm(), 4, 4);
+            Ok(InstructionDecoded::FenceI { pred, succ })
+        }
         (CSR_MATCH, csrrw::FUNCT3, _) => Ok(InstructionDecoded::CsrRw {
             rd: iinst.rd(),
             rs1: iinst.rs1(),
@@ -343,6 +352,6 @@ pub fn try_decode(inst: InstructionSize) -> Result<InstructionDecoded> {
     Ok(inst)
 }
 
-pub fn try_decode_compressed(inst: InstructionSize) -> Result<InstructionDecoded> {
+pub fn try_decode_compressed(_inst: InstructionSize) -> Result<InstructionDecoded> {
     Err(DecodeError::UnknownInstructionFormat).context(format!("Compressed instructions are not supported yet"))
 }

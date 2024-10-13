@@ -230,16 +230,16 @@ pub enum InstructionDecoded {
     },
 
     Fence {
-        rd: InstructionSize,
-        rs1: InstructionSize,
-        fm: InstructionSize,
+        // rd: InstructionSize,
+        // rs1: InstructionSize,
+        // fm: InstructionSize,
         pred: InstructionSize,
         succ: InstructionSize,
     },
     FenceI {
-        rd: InstructionSize,
-        rs1: InstructionSize,
-        fm: InstructionSize,
+        // rd: InstructionSize,
+        // rs1: InstructionSize,
+        // fm: InstructionSize,
         pred: InstructionSize,
         succ: InstructionSize,
     },
@@ -818,38 +818,18 @@ impl Display for InstructionDecoded {
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], CSRS.get(imm).map(|v| *v).unwrap_or(format!("{imm}").as_str())
                 )
             }
-            InstructionDecoded::Fence {
-                rd,
-                rs1,
-                fm,
-                pred,
-                succ,
-            } => {
+            InstructionDecoded::Fence { pred, succ } => {
                 write!(
                     f,
-                    "fence {}, {}, {}, {}, {}",
-                    REG_NAMES[*rd as usize],
-                    REG_NAMES[*rs1 as usize],
-                    *fm as i32,
-                    *pred as i32,
-                    *succ as i32
+                    "fence {}, {}",
+                    *pred as i32, *succ as i32
                 )
             }
-            InstructionDecoded::FenceI {
-                rd,
-                rs1,
-                fm,
-                pred,
-                succ,
-            } => {
+            InstructionDecoded::FenceI { pred, succ } => {
                 write!(
                     f,
-                    "fence.i {}, {}, {}, {}, {}",
-                    REG_NAMES[*rd as usize],
-                    REG_NAMES[*rs1 as usize],
-                    *fm as i32,
-                    *pred as i32,
-                    *succ as i32
+                    "fence.i {}, {}",
+                    *pred as i32, *succ as i32
                 )
             }
             InstructionDecoded::Flw {
