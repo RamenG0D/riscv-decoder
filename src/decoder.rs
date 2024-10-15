@@ -100,6 +100,71 @@ pub fn decode_rtype(inst: InstructionSize) -> Result<InstructionDecoded> {
             rs1: inst.rs1(),
             rs2: inst.rs2(),
         }),
+        // Atomic insts
+        imm @ (ATOMIC_MATCH, lr_w::FUNCT3, _) if (imm.2 >> 5) == lr_w::FUNCT5 => Ok(InstructionDecoded::LrW {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+            aq: get_bits(imm.2, 1, 1) == 1,
+            rl: get_bits(imm.2, 1, 0) == 1,
+        }),
+        imm @ (ATOMIC_MATCH, sc_w::FUNCT3, _) if (imm.2 >> 5) == sc_w::FUNCT5 => Ok(InstructionDecoded::ScW {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+            aq: get_bits(imm.2, 1, 1) == 1,
+            rl: get_bits(imm.2, 1, 0) == 1,
+        }),
+        imm @ (ATOMIC_MATCH, amoswap_w::FUNCT3, _) if (imm.2 >> 5) == amoswap_w::FUNCT5 => Ok(InstructionDecoded::AmoswapW {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+            aq: get_bits(imm.2, 1, 1) == 1,
+            rl: get_bits(imm.2, 1, 0) == 1,
+        }),
+        imm @ (ATOMIC_MATCH, amoadd_w::FUNCT3, _) if (imm.2 >> 5) == amoadd_w::FUNCT5 => Ok(InstructionDecoded::AmoaddW {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+            aq: get_bits(imm.2, 1, 1) == 1,
+            rl: get_bits(imm.2, 1, 0) == 1,
+        }),
+        imm @ (ATOMIC_MATCH, amoxor_w::FUNCT3, _) if (imm.2 >> 5) == amoxor_w::FUNCT5 => Ok(InstructionDecoded::AmoxorW {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+            aq: get_bits(imm.2, 1, 1) == 1,
+            rl: get_bits(imm.2, 1, 0) == 1,
+        }),
+        imm @ (ATOMIC_MATCH, amoand_w::FUNCT3, _) if (imm.2 >> 5) == amoand_w::FUNCT5 => Ok(InstructionDecoded::AmoandW {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+            aq: get_bits(imm.2, 1, 1) == 1,
+            rl: get_bits(imm.2, 1, 0) == 1,
+        }),
+        imm @ (ATOMIC_MATCH, amoor_w::FUNCT3, _) if (imm.2 >> 5) == amoor_w::FUNCT5 => Ok(InstructionDecoded::AmoorW {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+            aq: get_bits(imm.2, 1, 1) == 1,
+            rl: get_bits(imm.2, 1, 0) == 1,
+        }),
+        imm @ (ATOMIC_MATCH, amomin_w::FUNCT3, _) if (imm.2 >> 5) == amomin_w::FUNCT5 => Ok(InstructionDecoded::AmominW {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+            aq: get_bits(imm.2, 1, 1) == 1,
+            rl: get_bits(imm.2, 1, 0) == 1,
+        }),
+        imm @ (ATOMIC_MATCH, amomax_w::FUNCT3, _) if (imm.2 >> 5) == amomax_w::FUNCT5 => Ok(InstructionDecoded::AmomaxW {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+            aq: get_bits(imm.2, 1, 1) == 1,
+            rl: get_bits(imm.2, 1, 0) == 1,
+        }),
+
         _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown R-Type instruction"),
     }
 }
@@ -223,8 +288,6 @@ pub fn decode_itype(inst: InstructionSize) -> Result<InstructionDecoded> {
             rs1: iinst.rs1(),
             imm: iinst.uimm(),
         }),
-        // Atomic insts
-        (ATOMIC_MATCH, )
         // e-insts (ebreak, ecall)
         (CSR_MATCH, ebreak::FUNCT3, ebreak::IMM) => Ok(InstructionDecoded::EBreak),
         (CSR_MATCH, ecall::FUNCT3, ecall::IMM) => Ok(InstructionDecoded::ECall),
