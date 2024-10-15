@@ -390,7 +390,7 @@ pub mod itype {
         pub rd, _:     11, 7;
         pub funct3, _: 14, 12;
         pub rs1, _:    19, 15;
-        imm_unsigned, _:   31, 20;
+        uimm, _:   31, 20;
         SignedInstructionSize;
         imm_signed, _:   31, 20;
     }
@@ -402,10 +402,6 @@ pub mod itype {
 
         pub fn imm(&self) -> InstructionSize {
             self.imm_signed() as InstructionSize
-        }
-
-        pub fn uimm(&self) -> InstructionSize {
-            self.imm_unsigned()
         }
     }
 
