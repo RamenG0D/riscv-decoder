@@ -196,32 +196,32 @@ pub fn decode_itype(inst: InstructionSize) -> Result<InstructionDecoded> {
         (CSR_MATCH, csrrw::FUNCT3, _) => Ok(InstructionDecoded::CsrRw {
             rd: iinst.rd(),
             rs1: iinst.rs1(),
-            imm: iinst.imm(),
+            imm: iinst.uimm(),
         }),
         (CSR_MATCH, csrrs::FUNCT3, _) => Ok(InstructionDecoded::CsrRs {
             rd: iinst.rd(),
             rs1: iinst.rs1(),
-            imm: iinst.imm(),
+            imm: iinst.uimm(),
         }),
         (CSR_MATCH, csrrc::FUNCT3, _) => Ok(InstructionDecoded::CsrRc {
             rd: iinst.rd(),
             rs1: iinst.rs1(),
-            imm: iinst.imm(),
+            imm: iinst.uimm(),
         }),
         (CSR_MATCH, csrrwi::FUNCT3, _) => Ok(InstructionDecoded::CsrRwi {
             rd: iinst.rd(),
             rs1: iinst.rs1(),
-            imm: iinst.imm(),
+            imm: iinst.uimm(),
         }),
         (CSR_MATCH, csrrsi::FUNCT3, _) => Ok(InstructionDecoded::CsrRsi {
             rd: iinst.rd(),
             rs1: iinst.rs1(),
-            imm: iinst.imm(),
+            imm: iinst.uimm(),
         }),
         (CSR_MATCH, csrrci::FUNCT3, _) => Ok(InstructionDecoded::CsrRci {
             rd: iinst.rd(),
             rs1: iinst.rs1(),
-            imm: iinst.imm(),
+            imm: iinst.uimm(),
         }),
         // e-insts (ebreak, ecall)
         (CSR_MATCH, ebreak::FUNCT3, ebreak::IMM) => Ok(InstructionDecoded::EBreak),
