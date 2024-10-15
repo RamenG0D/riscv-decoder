@@ -796,7 +796,7 @@ impl Display for InstructionDecoded {
                 print_csr!(f, "csrw", "csrrw", rd, rs1, imm)
             }
             InstructionDecoded::CsrRs { rd, rs1, imm } => {
-                print_csr!(f, "csrs", "csrrrs", rd, rs1, imm)
+                print_csr!(f, "csrs", "csrrs", rd, rs1, imm)
             }
             InstructionDecoded::CsrRc { rd, rs1, imm } => {
                 print_csr!(f, "csrc", "csrrc", rd, rs1, imm)
