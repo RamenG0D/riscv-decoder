@@ -498,10 +498,10 @@ include!(concat!(env!("OUT_DIR"), "/codegen.rs"));
 
 macro_rules! print_csr {
     ($f:expr, $name:expr, $name_exp:expr, $rd:ident, $rs1:ident, $imm:ident) => {
-        if *$rd == 0 {
+        if *$rd == 0 || *$rd == *$rs1 {
             write!($f,
                 "{} {}, {}",
-                $name, REG_NAMES[*$rs1 as usize], CSRS.get($imm).map(|v| *v).unwrap_or(format!("{}", $imm).as_str())
+                $name, CSRS.get($imm).map(|v| *v).unwrap_or(format!("{}", $imm).as_str()), REG_NAMES[*$rs1 as usize]
             )
         } else {
             write!($f,
