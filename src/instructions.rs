@@ -226,17 +226,47 @@ instructions! {
         pub const FUNCT3: u32 = 1;
     }
     // atomic
-    lr_w {}
-    sc_w {}
-    amoswap_w {}
-    amoadd_w {}
-    amoxor_w {}
-    amoand_w {}
-    amoor_w {}
-    amomin_w {}
-    amomax_w {}
+    lr_w {
+        pub const FUNCT3: u32 = 2;
+        pub const FUNCT5: u32 = 2;
+    }
+    sc_w {
+        pub const FUNCT3: u32 = 2;
+        pub const FUNCT5: u32 = 3;
+    }
+    amoswap_w {
+        pub const FUNCT3: u32 = 2;
+        pub const FUNCT5: u32 = 1;
+    }
+    amoadd_w {
+        pub const FUNCT3: u32 = 2;
+        pub const FUNCT5: u32 = 0;
+    }
+    amoand_w {
+        pub const FUNCT3: u32 = 2;
+        pub const FUNCT5: u32 = 12;
+    }
+    amoor_w {
+        pub const FUNCT3: u32 = 2;
+        pub const FUNCT5: u32 = 10;
+    }
+    amoxor_w {
+        pub const FUNCT3: u32 = 2;
+        pub const FUNCT5: u32 = 4;
+    }
+    amomax_w {
+        pub const FUNCT3: u32 = 2;
+        pub const FUNCT5: u32 = 20;
+    }
+    amomin_w {
+        pub const FUNCT3: u32 = 2;
+        pub const FUNCT5: u32 = 16;
+    }
+
+    // ????
     amominu_w {}
     amomaxu_w {}
+
     // utype
     lui { /* Nothing here */ }
     auipc { /* Nothing here */ }
@@ -472,7 +502,7 @@ pub mod stype {
 }
 
 pub mod utype {
-    use super::{InstructionSize, SignedInstructionSize};
+    use super::InstructionSize;
     use bitfield::bitfield;
 
     bitfield! {
