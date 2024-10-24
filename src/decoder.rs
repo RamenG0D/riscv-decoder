@@ -62,6 +62,21 @@ pub fn decode_rtype(inst: InstructionSize) -> Result<InstructionDecoded> {
                     rs1: inst.rs1(),
                     rs2: inst.rs2(),
                 }),
+                (mul::FUNCT3, mul::FUNCT7) => Ok(InstructionDecoded::Mul {
+                    rd: inst.rd(),
+                    rs1: inst.rs1(),
+                    rs2: inst.rs2(),
+                }),
+                (mulh::FUNCT3, mulh::FUNCT7) => Ok(InstructionDecoded::Mulh {
+                    rd: inst.rd(),
+                    rs1: inst.rs1(),
+                    rs2: inst.rs2(),
+                }),
+                (mulu::FUNCT3, mulu::FUNCT7) => Ok(InstructionDecoded::Mulu {
+                    rd: inst.rd(),
+                    rs1: inst.rs1(),
+                    rs2: inst.rs2(),
+                }),
                 _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown Arithmetic Register instruction (R-type)"),
             }
         }
