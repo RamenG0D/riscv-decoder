@@ -244,7 +244,7 @@ pub enum InstructionDecoded {
         succ: InstructionSize,
     },
 
-    // D Extension (floats)
+    // F Extension (floats)
     Flw {
         rd: InstructionSize,
         width: InstructionSize,
@@ -499,14 +499,25 @@ include!(concat!(env!("OUT_DIR"), "/codegen.rs"));
 macro_rules! print_csr {
     ($f:expr, $name:expr, $name_exp:expr, $rd:ident, $rs1:ident, $imm:ident) => {
         if *$rd == 0 || *$rd == *$rs1 {
-            write!($f,
+            write!(
+                $f,
                 "{} {}, {}",
-                $name, CSRS.get($imm).map(|v| *v).unwrap_or(format!("{}", $imm).as_str()), REG_NAMES[*$rs1 as usize]
+                $name,
+                CSRS.get($imm)
+                    .map(|v| *v)
+                    .unwrap_or(format!("{}", $imm).as_str()),
+                REG_NAMES[*$rs1 as usize]
             )
         } else {
-            write!($f,
+            write!(
+                $f,
                 "{} {}, {}, {}",
-                $name_exp, REG_NAMES[*$rd as usize], CSRS.get($imm).map(|v| *v).unwrap_or(format!("{}", $imm).as_str()), REG_NAMES[*$rs1 as usize]
+                $name_exp,
+                REG_NAMES[*$rd as usize],
+                CSRS.get($imm)
+                    .map(|v| *v)
+                    .unwrap_or(format!("{}", $imm).as_str()),
+                REG_NAMES[*$rs1 as usize]
             )
         }
     };
@@ -768,9 +779,14 @@ impl Display for InstructionDecoded {
             InstructionDecoded::Jalr { rd, rs1, imm } => {
                 let args = match (*imm as i32 == 0, rd == rs1) {
                     (true, true) => format!("{}", REG_NAMES[*rd as usize]),
-                    (true, false) => format!("{}, {}", REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize]),
+                    (true, false) => {
+                        format!("{}, {}", REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize])
+                    }
                     (false, true) => format!("{}({})", *imm as i32, REG_NAMES[*rd as usize]),
-                    (false, false) => format!("{}, {}({})", REG_NAMES[*rd as usize], *imm as i32, REG_NAMES[*rs1 as usize]),
+                    (false, false) => format!(
+                        "{}, {}({})",
+                        REG_NAMES[*rd as usize], *imm as i32, REG_NAMES[*rs1 as usize]
+                    ),
                 };
                 write!(f, "jalr {args}")
             }
@@ -811,18 +827,10 @@ impl Display for InstructionDecoded {
                 print_csr!(f, "csrci", "csrrci", rd, rs1, imm)
             }
             InstructionDecoded::Fence { pred, succ } => {
-                write!(
-                    f,
-                    "fence {}, {}",
-                    *pred as i32, *succ as i32
-                )
+                write!(f, "fence {}, {}", *pred as i32, *succ as i32)
             }
             InstructionDecoded::FenceI { pred, succ } => {
-                write!(
-                    f,
-                    "fence.i {}, {}",
-                    *pred as i32, *succ as i32
-                )
+                write!(f, "fence.i {}, {}", *pred as i32, *succ as i32)
             }
             InstructionDecoded::Flw {
                 rd,

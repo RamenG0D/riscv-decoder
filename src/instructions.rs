@@ -266,6 +266,90 @@ instructions! {
     amominu_w {}
     amomaxu_w {}
 
+    // F extention instructions
+    fadd_s {
+        pub const FUNCT3: u32 = 7;
+        pub const FUNCT5: u32 = 0;
+    }
+    fsub_s {
+        pub const FUNCT3: u32 = 7;
+        pub const FUNCT5: u32 = 1;
+    }
+    fmul_s {
+        pub const FUNCT3: u32 = 7;
+        pub const FUNCT5: u32 = 2;
+    }
+    fdiv_s {
+        pub const FUNCT3: u32 = 7;
+        pub const FUNCT5: u32 = 3;
+    }
+    fsqrt_s {
+        pub const FUNCT3: u32 = 7;
+        pub const FUNCT5: u32 = 11;
+    }
+    fsgnj_s {
+        pub const FUNCT3: u32 = 0;
+        pub const FUNCT5: u32 = 4;
+    }
+    fsgnjn_s {
+        pub const FUNCT3: u32 = 1;
+        pub const FUNCT5: u32 = 4;
+    }
+    fsgnjx_s {
+        pub const FUNCT3: u32 = 2;
+        pub const FUNCT5: u32 = 4;
+    }
+    fmin_s {
+        pub const FUNCT3: u32 = 0;
+        pub const FUNCT5: u32 = 5;
+    }
+    fmax_s {
+        pub const FUNCT3: u32 = 1;
+        pub const FUNCT5: u32 = 5;
+    }
+    fcvt_w_s {
+        pub const FUNCT3: u32 = 7;
+        pub const FUNCT5: u32 = 24;
+        pub const RS2: u32 = 0;
+    }
+    fcvt_wu_s {
+        pub const FUNCT3: u32 = 7;
+        pub const FUNCT5: u32 = 24;
+        pub const RS2: u32 = 1;
+    }
+    fcvt_s_w {
+        pub const FUNCT3: u32 = 7;
+        pub const FUNCT5: u32 = 26;
+    }
+    fcvt_s_wu {
+        pub const FUNCT3: u32 = 7;
+        pub const FUNCT5: u32 = 27;
+    }
+    fmv_x_w {
+        pub const FUNCT3: u32 = 0;
+        pub const FUNCT5: u32 = 28;
+    }
+    fmv_w_x {
+        pub const FUNCT3: u32 = 0;
+        pub const FUNCT5: u32 = 30;
+    }
+    fle_s {
+        pub const FUNCT3: u32 = 0;
+        pub const FUNCT5: u32 = 20;
+    }
+    flt_s {
+        pub const FUNCT3: u32 = 1;
+        pub const FUNCT5: u32 = 20;
+    }
+    feq_s {
+        pub const FUNCT3: u32 = 2;
+        pub const FUNCT5: u32 = 20;
+    }
+    fclass_s {
+        pub const FUNCT3: u32 = 1;
+        pub const FUNCT5: u32 = 28;
+    }
+
     // utype
     lui { /* Nothing here */ }
     auipc { /* Nothing here */ }
@@ -349,6 +433,10 @@ pub const AUIPC_MATCH: InstructionSize = 23;
 pub const LUI_MATCH: InstructionSize = 55;
 pub const STORE_MATCH: InstructionSize = 35;
 pub const ARITMETIC_REGISTER_MATCH: InstructionSize = 51;
+
+// TODO: maybe this is correct, check it
+pub const FLOATING_POINT_MATCH: InstructionSize = 83;
+
 pub const BRANCH_MATCH: InstructionSize = 99;
 pub const CSR_MATCH: InstructionSize = 115;
 pub const JALR_MATCH: InstructionSize = 103;
@@ -456,11 +544,14 @@ pub mod itype {
         assert_eq!(inst.imm(), 3);
         use crate::{decoded_inst::InstructionDecoded, decoder::try_decode};
         let inst = try_decode(0x379793 /* slli a5, a5, 3 */).unwrap();
-        assert!(matches!(inst, InstructionDecoded::Slli {
-            rd: 15,
-            rs1: 15,
-            imm: 3
-        }));
+        assert!(matches!(
+            inst,
+            InstructionDecoded::Slli {
+                rd: 15,
+                rs1: 15,
+                imm: 3
+            }
+        ));
         let inst = IType(0x00197793 /* andi a5, s2, 1 */);
         assert_eq!(inst.rd(), 15);
         assert_eq!(inst.rs1(), 18);

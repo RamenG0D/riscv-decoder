@@ -324,5 +324,10 @@ fn main() {
         map.entry(k, v);
     }
 
-    writeln!(&mut file, "static CSRS: phf::Map<u32, &'static str> = {};", map.build()).unwrap();
+    writeln!(
+        &mut file,
+        "static CSRS: phf::Map<u32, &'static str> = {};",
+        map.build()
+    )
+    .unwrap();
 }
