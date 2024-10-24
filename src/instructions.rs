@@ -94,6 +94,10 @@ instructions! {
         pub const FUNCT3: u32 = 0;
         pub const IMM: u32 = 0;
     }
+    sfencevma {
+        pub const FUNCT3: u32 = 0;
+        pub const IMM: u32 = 0x120;
+    }
     ebreak {
         pub const FUNCT3: u32 = 0;
         pub const IMM: u32 = 1;
@@ -106,11 +110,6 @@ instructions! {
         pub const FUNCT3: u32 = 0;
         pub const IMM: u32 = 0x102;
     }
-    // TODO: Figure out what sfencevma is????
-    /*sfencevma {
-        pub const FUNCT3: u32 = ;
-        pub const IMM: u32 = ;
-    }*/
     // M type
     mul {
         pub const FUNCT3: u32 = 0;
@@ -377,6 +376,14 @@ pub mod rtype {
             Self(inst)
         }
     }
+
+    #[test]
+    fn atomic_check() {
+        let inst = RType(0xCF4A7AF /* amoswap.w x15, x15, (x9) */);
+        assert_eq!(inst.rd(), 15);
+        assert_eq!(inst.rs1(), 9);
+        assert_eq!(inst.rs2(), 15);
+    }
 }
 
 pub mod itype {
@@ -390,7 +397,7 @@ pub mod itype {
         pub rd, _:     11, 7;
         pub funct3, _: 14, 12;
         pub rs1, _:    19, 15;
-        uimm, _:   31, 20;
+        pub uimm, _:   31, 20;
         SignedInstructionSize;
         imm_signed, _:   31, 20;
     }

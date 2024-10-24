@@ -1,6 +1,7 @@
 use crate::{decoded_inst::InstructionDecoded, error::DecodeError, instructions::*};
 use anyhow::{Context, Result};
-use crate::bit_ops::get_bits;
+use crate::bit_ops::*;
+use paste::paste;
 
 const OPCODE_MASK: InstructionSize = crate::bit_ops::create_mask(7);
 // basically the opcode mask but for a compressed instruction (a compresed inst's opcode is the first 2 bits)
@@ -101,68 +102,68 @@ pub fn decode_rtype(inst: InstructionSize) -> Result<InstructionDecoded> {
             rs2: inst.rs2(),
         }),
         // Atomic insts
-        imm @ (ATOMIC_MATCH, lr_w::FUNCT3, _) if (imm.2 >> 5) == lr_w::FUNCT5 => Ok(InstructionDecoded::LrW {
+        imm @ (ATOMIC_MATCH, lr_w::FUNCT3, _) if get_bits(imm.2, 5, 2) == lr_w::FUNCT5 => Ok(InstructionDecoded::LrW {
             rd: inst.rd(),
             rs1: inst.rs1(),
             rs2: inst.rs2(),
-            aq: get_bits(imm.2, 1, 1) == 1,
-            rl: get_bits(imm.2, 1, 0) == 1,
+            aq: is_set(imm.2, 1),
+            rl: is_set(imm.2, 0),
         }),
-        imm @ (ATOMIC_MATCH, sc_w::FUNCT3, _) if (imm.2 >> 5) == sc_w::FUNCT5 => Ok(InstructionDecoded::ScW {
+        imm @ (ATOMIC_MATCH, sc_w::FUNCT3, _) if get_bits(imm.2, 5, 2) == sc_w::FUNCT5 => Ok(InstructionDecoded::ScW {
             rd: inst.rd(),
             rs1: inst.rs1(),
             rs2: inst.rs2(),
-            aq: get_bits(imm.2, 1, 1) == 1,
-            rl: get_bits(imm.2, 1, 0) == 1,
+            aq: is_set(imm.2, 1),
+            rl: is_set(imm.2, 0),
         }),
-        imm @ (ATOMIC_MATCH, amoswap_w::FUNCT3, _) if (imm.2 >> 5) == amoswap_w::FUNCT5 => Ok(InstructionDecoded::AmoswapW {
+        imm @ (ATOMIC_MATCH, amoswap_w::FUNCT3, _) if get_bits(imm.2, 5, 2) == amoswap_w::FUNCT5 => Ok(InstructionDecoded::AmoswapW {
             rd: inst.rd(),
             rs1: inst.rs1(),
             rs2: inst.rs2(),
-            aq: get_bits(imm.2, 1, 1) == 1,
-            rl: get_bits(imm.2, 1, 0) == 1,
+            aq: is_set(imm.2, 1),
+            rl: is_set(imm.2, 0),
         }),
-        imm @ (ATOMIC_MATCH, amoadd_w::FUNCT3, _) if (imm.2 >> 5) == amoadd_w::FUNCT5 => Ok(InstructionDecoded::AmoaddW {
+        imm @ (ATOMIC_MATCH, amoadd_w::FUNCT3, _) if get_bits(imm.2, 5, 2) == amoadd_w::FUNCT5 => Ok(InstructionDecoded::AmoaddW {
             rd: inst.rd(),
             rs1: inst.rs1(),
             rs2: inst.rs2(),
-            aq: get_bits(imm.2, 1, 1) == 1,
-            rl: get_bits(imm.2, 1, 0) == 1,
+            aq: is_set(imm.2, 1),
+            rl: is_set(imm.2, 0),
         }),
-        imm @ (ATOMIC_MATCH, amoxor_w::FUNCT3, _) if (imm.2 >> 5) == amoxor_w::FUNCT5 => Ok(InstructionDecoded::AmoxorW {
+        imm @ (ATOMIC_MATCH, amoxor_w::FUNCT3, _) if get_bits(imm.2, 5, 2) == amoxor_w::FUNCT5 => Ok(InstructionDecoded::AmoxorW {
             rd: inst.rd(),
             rs1: inst.rs1(),
             rs2: inst.rs2(),
-            aq: get_bits(imm.2, 1, 1) == 1,
-            rl: get_bits(imm.2, 1, 0) == 1,
+            aq: is_set(imm.2, 1),
+            rl: is_set(imm.2, 0),
         }),
-        imm @ (ATOMIC_MATCH, amoand_w::FUNCT3, _) if (imm.2 >> 5) == amoand_w::FUNCT5 => Ok(InstructionDecoded::AmoandW {
+        imm @ (ATOMIC_MATCH, amoand_w::FUNCT3, _) if get_bits(imm.2, 5, 2) == amoand_w::FUNCT5 => Ok(InstructionDecoded::AmoandW {
             rd: inst.rd(),
             rs1: inst.rs1(),
             rs2: inst.rs2(),
-            aq: get_bits(imm.2, 1, 1) == 1,
-            rl: get_bits(imm.2, 1, 0) == 1,
+            aq: is_set(imm.2, 1),
+            rl: is_set(imm.2, 0),
         }),
-        imm @ (ATOMIC_MATCH, amoor_w::FUNCT3, _) if (imm.2 >> 5) == amoor_w::FUNCT5 => Ok(InstructionDecoded::AmoorW {
+        imm @ (ATOMIC_MATCH, amoor_w::FUNCT3, _) if get_bits(imm.2, 5, 2) == amoor_w::FUNCT5 => Ok(InstructionDecoded::AmoorW {
             rd: inst.rd(),
             rs1: inst.rs1(),
             rs2: inst.rs2(),
-            aq: get_bits(imm.2, 1, 1) == 1,
-            rl: get_bits(imm.2, 1, 0) == 1,
+            aq: is_set(imm.2, 1),
+            rl: is_set(imm.2, 0),
         }),
-        imm @ (ATOMIC_MATCH, amomin_w::FUNCT3, _) if (imm.2 >> 5) == amomin_w::FUNCT5 => Ok(InstructionDecoded::AmominW {
+        imm @ (ATOMIC_MATCH, amomin_w::FUNCT3, _) if get_bits(imm.2, 5, 2) == amomin_w::FUNCT5 => Ok(InstructionDecoded::AmominW {
             rd: inst.rd(),
             rs1: inst.rs1(),
             rs2: inst.rs2(),
-            aq: get_bits(imm.2, 1, 1) == 1,
-            rl: get_bits(imm.2, 1, 0) == 1,
+            aq: is_set(imm.2, 1),
+            rl: is_set(imm.2, 0),
         }),
-        imm @ (ATOMIC_MATCH, amomax_w::FUNCT3, _) if (imm.2 >> 5) == amomax_w::FUNCT5 => Ok(InstructionDecoded::AmomaxW {
+        imm @ (ATOMIC_MATCH, amomax_w::FUNCT3, _) if get_bits(imm.2, 5, 2) == amomax_w::FUNCT5 => Ok(InstructionDecoded::AmomaxW {
             rd: inst.rd(),
             rs1: inst.rs1(),
             rs2: inst.rs2(),
-            aq: get_bits(imm.2, 1, 1) == 1,
-            rl: get_bits(imm.2, 1, 0) == 1,
+            aq: is_set(imm.2, 1),
+            rl: is_set(imm.2, 0),
         }),
 
         _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown R-Type instruction"),
@@ -205,17 +206,17 @@ pub fn decode_itype(inst: InstructionSize) -> Result<InstructionDecoded> {
         imm @ (ARITMETIC_IMMEDIATE_MATCH, slli::FUNCT3, _) if (imm.2 >> 5) == slli::IMM => Ok(InstructionDecoded::Slli {
             rd: iinst.rd(),
             rs1: iinst.rs1(),
-            imm: imm.2 & 0b11111,
+            imm: get_bits(imm.2, 5, 0),
         }),
         imm @ (ARITMETIC_IMMEDIATE_MATCH, srli::FUNCT3, _) if (imm.2 >> 5) == srli::IMM => Ok(InstructionDecoded::Srli {
             rd: iinst.rd(),
             rs1: iinst.rs1(),
-            imm: imm.2 & 0b11111,
+            imm: get_bits(imm.2, 5, 0),
         }),
         imm @ (ARITMETIC_IMMEDIATE_MATCH, srai::FUNCT3, _) if (imm.2 >> 5) == srai::IMM => Ok(InstructionDecoded::Srai {
             rd: iinst.rd(),
             rs1: iinst.rs1(),
-            imm: imm.2 & 0b11111,
+            imm: get_bits(imm.2, 5, 0),
         }),
         // Load
         (LOAD_MATCH, lb::FUNCT3, _) => Ok(InstructionDecoded::Lb {
@@ -249,8 +250,8 @@ pub fn decode_itype(inst: InstructionSize) -> Result<InstructionDecoded> {
             imm: iinst.imm(),
         }),
         (FENCE_MATCH, fence::FUNCT3, _) => {
-            let pred = iinst.imm() & 0b1111;
-            let succ = (iinst.imm() >> 4) & 0b1111;
+            let pred = get_bits(iinst.imm(), 4, 0);
+            let succ = get_bits(iinst.imm() >> 4, 4, 0);
             Ok(InstructionDecoded::Fence { pred, succ })
         }
         (FENCE_MATCH, fence_i::FUNCT3, _) => {
@@ -289,12 +290,12 @@ pub fn decode_itype(inst: InstructionSize) -> Result<InstructionDecoded> {
             imm: iinst.uimm(),
         }),
         // e-insts (ebreak, ecall)
+        (CSR_MATCH, sfencevma::FUNCT3, sfencevma::IMM) => Ok(InstructionDecoded::SFenceVma),
         (CSR_MATCH, ebreak::FUNCT3, ebreak::IMM) => Ok(InstructionDecoded::EBreak),
         (CSR_MATCH, ecall::FUNCT3, ecall::IMM) => Ok(InstructionDecoded::ECall),
         (CSR_MATCH, mret::FUNCT3, mret::IMM) => Ok(InstructionDecoded::MRet),
         (CSR_MATCH, sret::FUNCT3, sret::IMM) => Ok(InstructionDecoded::SRet),
         // TODO: SFenceVMA
-        // (CSR_MATCH, sfencevma::FUNCT3, sfencevma::IMM) => Ok(InstructionDecoded::SFenceVma),
         _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown I-Type instruction"),
     }
 }
@@ -394,7 +395,7 @@ pub fn try_decode(inst: InstructionSize) -> Result<InstructionDecoded> {
     }
 
     let fmt = match inst & OPCODE_MASK {
-        ARITMETIC_REGISTER_MATCH => InstructionFormat::RType,
+        ATOMIC_MATCH | ARITMETIC_REGISTER_MATCH => InstructionFormat::RType,
         STORE_MATCH => InstructionFormat::SType,
         BRANCH_MATCH => InstructionFormat::BType,
         JAL_MATCH => InstructionFormat::JType,
@@ -420,3 +421,25 @@ pub fn try_decode(inst: InstructionSize) -> Result<InstructionDecoded> {
 pub fn try_decode_compressed(_inst: InstructionSize) -> Result<InstructionDecoded> {
     Err(DecodeError::UnknownInstructionFormat).context(format!("Compressed instructions are not supported yet"))
 }
+
+macro_rules! decode_test {
+    ($inst:ident, $value:expr, $expected:expr) => {
+        paste!{
+            #[test]
+            fn [<test_decode_ $inst>]() {
+                let inst = try_decode($value).expect("Failed to decode inst");
+                assert_eq!(inst, $expected);
+            }
+        }
+    };
+}
+
+decode_test!(amoswap_w, 0xCF4A7AF /* amoswap.w x15, x15, (x9) */, InstructionDecoded::AmoswapW {
+    rd: 15,
+    rs1: 9,
+    rs2: 15,
+    rl: false,
+    aq: true,
+});
+
+// TODO: add more tests!

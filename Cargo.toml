@@ -12,6 +12,7 @@ anyhow = "1.0.89"
 bit_ops = "0.1.13"
 bitfield = "0.17.0"
 thiserror = "1.0.64"
+paste = "1.0.15"
 
 [dependencies.instruction-creator]
 path = "instruction-creator"

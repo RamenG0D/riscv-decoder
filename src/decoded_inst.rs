@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use crate::instructions::InstructionSize;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum InstructionDecoded {
     Lb {
         rd: InstructionSize,
