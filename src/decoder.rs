@@ -178,6 +178,18 @@ pub fn decode_rtype(inst: InstructionSize) -> Result<InstructionDecoded> {
                     rd: inst.rd(),
                     rs1: inst.rs1(),
                 }),
+                (fcvt_s_wu::FUNCT3, fcvt_s_wu::FUNCT5) => Ok(InstructionDecoded::FcvtSWU {
+                    rd: inst.rd(),
+                    rs1: inst.rs1(),
+                }),
+                (fmv_x_w::FUNCT3, fmv_x_w::FUNCT5) => Ok(InstructionDecoded::FmvXW {
+                    rd: inst.rd(),
+                    rs1: inst.rs1(),
+                }),
+                (fmv_w_x::FUNCT3, fmv_w_x::FUNCT5) => Ok(InstructionDecoded::FmvWX {
+                    rd: inst.rd(),
+                    rs1: inst.rs1(),
+                }),
                 _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown Floating Point instruction"),
             }
         }
