@@ -267,6 +267,12 @@ instructions! {
     amomaxu_w {}
 
     // F extention instructions
+    flw {
+        pub const FUNCT3: u32 = 2;
+    }
+    fsw {
+        pub const FUNCT3: u32 = 2;
+    }
     fadd_s {
         pub const FUNCT3: u32 = 7;
         pub const FUNCT5: u32 = 0;
@@ -308,12 +314,12 @@ instructions! {
         pub const FUNCT5: u32 = 5;
     }
     fcvt_w_s {
-        pub const FUNCT3: u32 = 7;
+        pub const FUNCT3: u32 = 1;
         pub const FUNCT5: u32 = 24;
         pub const RS2: u32 = 0;
     }
     fcvt_wu_s {
-        pub const FUNCT3: u32 = 7;
+        pub const FUNCT3: u32 = 1;
         pub const FUNCT5: u32 = 24;
         pub const RS2: u32 = 1;
     }
@@ -349,6 +355,104 @@ instructions! {
         pub const FUNCT3: u32 = 1;
         pub const FUNCT5: u32 = 28;
     }
+
+    // D extention instructions
+    fld {
+        pub const FUNCT3: u32 = 3;
+    }
+    fsd {
+        pub const FUNCT3: u32 = 3;
+    }
+    fadd_d {
+        pub const FUNCT3: u32 = 7;
+        pub const FUNCT5: u32 = 0;
+    }
+    fsub_d {
+        pub const FUNCT3: u32 = 7;
+        pub const FUNCT5: u32 = 1;
+    }
+    fmul_d {
+        pub const FUNCT3: u32 = 7;
+        pub const FUNCT5: u32 = 2;
+    }
+    fdiv_d {
+        pub const FUNCT3: u32 = 7;
+        pub const FUNCT5: u32 = 3;
+    }
+    fsqrt_d {
+        pub const FUNCT3: u32 = 7;
+        pub const FUNCT5: u32 = 11;
+    }
+    fsgnj_d {
+        pub const FUNCT3: u32 = 0;
+        pub const FUNCT5: u32 = 4;
+    }
+    fsgnjn_d {
+        pub const FUNCT3: u32 = 1;
+        pub const FUNCT5: u32 = 4;
+    }
+    fsgnjx_d {
+        pub const FUNCT3: u32 = 2;
+        pub const FUNCT5: u32 = 4;
+    }
+    fmin_d {
+        pub const FUNCT3: u32 = 0;
+        pub const FUNCT5: u32 = 5;
+    }
+    fmax_d {
+        pub const FUNCT3: u32 = 1;
+        pub const FUNCT5: u32 = 5;
+    }
+    fcvt_d_s {
+        pub const FUNCT3: u32 = 7;
+        pub const FUNCT5: u32 = 8;
+        pub const RS2: u32 = 0;
+    }
+    fcvt_s_d {
+        pub const FUNCT3: u32 = 7;
+        pub const FUNCT5: u32 = 8;
+        pub const RS2: u32 = 1;
+    }
+    fcvt_d_w {
+        pub const FUNCT3: u32 = 7;
+        pub const FUNCT5: u32 = 26;
+        pub const RS2: u32 = 0;
+    }
+    fcvt_d_wu {
+        pub const FUNCT3: u32 = 7;
+        pub const FUNCT5: u32 = 26;
+        pub const RS2: u32 = 1;
+    }
+    fcvt_w_d {
+        pub const FUNCT3: u32 = 7;
+        pub const FUNCT5: u32 = 24;
+        pub const RS2: u32 = 0;
+    }
+    fcvt_wu_d {
+        pub const FUNCT3: u32 = 7;
+        pub const FUNCT5: u32 = 24;
+        pub const RS2: u32 = 1;
+    }
+    fle_d {
+        pub const FUNCT3: u32 = 0;
+        pub const FUNCT5: u32 = 20;
+    }
+    flt_d {
+        pub const FUNCT3: u32 = 1;
+        pub const FUNCT5: u32 = 20;
+    }
+    feq_d {
+        pub const FUNCT3: u32 = 2;
+        pub const FUNCT5: u32 = 20;
+    }
+    fclass_d {
+        pub const FUNCT3: u32 = 1;
+        pub const FUNCT5: u32 = 28;
+    }
+    // TODO: FINISH implementing the D extention instructions :D
+
+    // C extention instructions
+    // TODO: maybe implement this
 
     // utype
     lui { /* Nothing here */ }
@@ -427,12 +531,15 @@ pub mod compressed {
 }
 
 pub const LOAD_MATCH: InstructionSize = 3;
+pub const FLOAD_MATCH: InstructionSize = 7;
 pub const FENCE_MATCH: InstructionSize = 15;
 pub const ARITMETIC_IMMEDIATE_MATCH: InstructionSize = 19;
 pub const AUIPC_MATCH: InstructionSize = 23;
 pub const LUI_MATCH: InstructionSize = 55;
+pub const FSTORE_MATCH: InstructionSize = 39;
 pub const STORE_MATCH: InstructionSize = 35;
 pub const ARITMETIC_REGISTER_MATCH: InstructionSize = 51;
+pub const FLOAT_MATCH: InstructionSize = 83;
 
 // TODO: maybe this is correct, check it
 pub const FLOATING_POINT_MATCH: InstructionSize = 83;

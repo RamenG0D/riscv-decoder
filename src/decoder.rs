@@ -62,6 +62,8 @@ pub fn decode_rtype(inst: InstructionSize) -> Result<InstructionDecoded> {
                     rs1: inst.rs1(),
                     rs2: inst.rs2(),
                 }),
+
+                // M extension
                 (mul::FUNCT3, mul::FUNCT7) => Ok(InstructionDecoded::Mul {
                     rd: inst.rd(),
                     rs1: inst.rs1(),
@@ -77,6 +79,32 @@ pub fn decode_rtype(inst: InstructionSize) -> Result<InstructionDecoded> {
                     rs1: inst.rs1(),
                     rs2: inst.rs2(),
                 }),
+                (mulsu::FUNCT3, mulsu::FUNCT7) => Ok(InstructionDecoded::Mulsu {
+                    rd: inst.rd(),
+                    rs1: inst.rs1(),
+                    rs2: inst.rs2(),
+                }),
+                (div::FUNCT3, div::FUNCT7) => Ok(InstructionDecoded::Div {
+                    rd: inst.rd(),
+                    rs1: inst.rs1(),
+                    rs2: inst.rs2(),
+                }),
+                (divu::FUNCT3, divu::FUNCT7) => Ok(InstructionDecoded::Divu {
+                    rd: inst.rd(),
+                    rs1: inst.rs1(),
+                    rs2: inst.rs2(),
+                }),
+                (rem::FUNCT3, rem::FUNCT7) => Ok(InstructionDecoded::Rem {
+                    rd: inst.rd(),
+                    rs1: inst.rs1(),
+                    rs2: inst.rs2(),
+                }),
+                (remu::FUNCT3, remu::FUNCT7) => Ok(InstructionDecoded::Remu {
+                    rd: inst.rd(),
+                    rs1: inst.rs1(),
+                    rs2: inst.rs2(),
+                }),
+
                 _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown Arithmetic Register instruction (R-type)"),
             }
         }
@@ -96,100 +124,16 @@ pub fn decode_rtype(inst: InstructionSize) -> Result<InstructionDecoded> {
         }
         FLOATING_POINT_MATCH => {
             let funct5 = get_bits(inst.funct7(), 5, 2);
-            let fmt = get_bits(inst.funct7(), 2, 0);
-            assert!(fmt == 0, "the fmt of an inst cannot be non 0 because we only support single precision floating point instructions currently!");
-            match (inst.funct3(), funct5) {
-                (fadd_s::FUNCT3, fadd_s::FUNCT5) => Ok(InstructionDecoded::FaddS {
-                    rd: inst.rd(),
-                    rs1: inst.rs1(),
-                    rs2: inst.rs2(),
-                }),
-                (fsub_s::FUNCT3, fsub_s::FUNCT5) => Ok(InstructionDecoded::FsubS {
-                    rd: inst.rd(),
-                    rs1: inst.rs1(),
-                    rs2: inst.rs2(),
-                }),
-                (fmul_s::FUNCT3, fmul_s::FUNCT5) => Ok(InstructionDecoded::FmulS {
-                    rd: inst.rd(),
-                    rs1: inst.rs1(),
-                    rs2: inst.rs2(),
-                }),
-                (fdiv_s::FUNCT3, fdiv_s::FUNCT5) => Ok(InstructionDecoded::FdivS {
-                    rd: inst.rd(),
-                    rs1: inst.rs1(),
-                    rs2: inst.rs2(),
-                }),
-                (fsgnj_s::FUNCT3, fsgnj_s::FUNCT5) => Ok(InstructionDecoded::FsgnjS {
-                    rd: inst.rd(),
-                    rs1: inst.rs1(),
-                    rs2: inst.rs2(),
-                }),
-                (fsgnjn_s::FUNCT3, fsgnjn_s::FUNCT5) => Ok(InstructionDecoded::FsgnjnS {
-                    rd: inst.rd(),
-                    rs1: inst.rs1(),
-                    rs2: inst.rs2(),
-                }),
-                (fsgnjx_s::FUNCT3, fsgnjx_s::FUNCT5) => Ok(InstructionDecoded::FsgnjxS {
-                    rd: inst.rd(),
-                    rs1: inst.rs1(),
-                    rs2: inst.rs2(),
-                }),
-                (fmin_s::FUNCT3, fmin_s::FUNCT5) => Ok(InstructionDecoded::FminS {
-                    rd: inst.rd(),
-                    rs1: inst.rs1(),
-                    rs2: inst.rs2(),
-                }),
-                (fmax_s::FUNCT3, fmax_s::FUNCT5) => Ok(InstructionDecoded::FmaxS {
-                    rd: inst.rd(),
-                    rs1: inst.rs1(),
-                    rs2: inst.rs2(),
-                }),
-                (fcvt_w_s::FUNCT3, fcvt_w_s::FUNCT5) => match inst.rs2() {
-                    fcvt_w_s::RS2 => Ok(InstructionDecoded::FcvtWUS {
-                        rd: inst.rd(),
-                        rs1: inst.rs1(),
-                    }),
-                    fcvt_wu_s::RS2 => Ok(InstructionDecoded::FcvtWS {
-                        rd: inst.rd(),
-                        rs1: inst.rs1(),
-                    }),
-                    _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown Floating Point instruction"),
-                }
-                (feq_s::FUNCT3, feq_s::FUNCT5) => Ok(InstructionDecoded::FeqS {
-                    rd: inst.rd(),
-                    rs1: inst.rs1(),
-                    rs2: inst.rs2(),
-                }),
-                (flt_s::FUNCT3, flt_s::FUNCT5) => Ok(InstructionDecoded::FltS {
-                    rd: inst.rd(),
-                    rs1: inst.rs1(),
-                    rs2: inst.rs2(),
-                }),
-                (fle_s::FUNCT3, fle_s::FUNCT5) => Ok(InstructionDecoded::FleS {
-                    rd: inst.rd(),
-                    rs1: inst.rs1(),
-                    rs2: inst.rs2(),
-                }),
-                (fclass_s::FUNCT3, fclass_s::FUNCT5) => Ok(InstructionDecoded::FClassS {
-                    rd: inst.rd(),
-                    rs1: inst.rs1(),
-                }),
-                (fcvt_s_w::FUNCT3, fcvt_s_w::FUNCT5) => Ok(InstructionDecoded::FcvtSW {
-                    rd: inst.rd(),
-                    rs1: inst.rs1(),
-                }),
-                (fcvt_s_wu::FUNCT3, fcvt_s_wu::FUNCT5) => Ok(InstructionDecoded::FcvtSWU {
-                    rd: inst.rd(),
-                    rs1: inst.rs1(),
-                }),
-                (fmv_x_w::FUNCT3, fmv_x_w::FUNCT5) => Ok(InstructionDecoded::FmvXW {
-                    rd: inst.rd(),
-                    rs1: inst.rs1(),
-                }),
-                (fmv_w_x::FUNCT3, fmv_w_x::FUNCT5) => Ok(InstructionDecoded::FmvWX {
-                    rd: inst.rd(),
-                    rs1: inst.rs1(),
-                }),
+            let fmt = get_bits(inst.funct7(), 2, 0) as u8;
+            // assert!(fmt == 0, "the fmt of an inst cannot be non 0 because we only support single precision floating point instructions currently!");
+            const SINGLE_PRECISION_MATCH: u8 = 0;
+            const DOUBLE_PRECISION_MATCH: u8 = 1;
+            const QUAD_PRECISION_MATCH: u8 = 3;
+
+            match fmt {
+                SINGLE_PRECISION_MATCH => decode_single_precision(&inst, inst.funct3(), funct5),
+                DOUBLE_PRECISION_MATCH => decode_double_precision(&inst, inst.funct3(), funct5),
+                QUAD_PRECISION_MATCH => decode_quad_precision(&inst, inst.funct3(), funct5),
                 _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown Floating Point instruction"),
             }
         }
@@ -198,137 +142,369 @@ pub fn decode_rtype(inst: InstructionSize) -> Result<InstructionDecoded> {
     }
 }
 
+fn decode_single_precision(inst: &rtype::RType, funct3: InstructionSize, funct5: InstructionSize) -> Result<InstructionDecoded> {
+    match (funct3, funct5) {
+        (fadd_s::FUNCT3, fadd_s::FUNCT5) => Ok(InstructionDecoded::FaddS {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (fsub_s::FUNCT3, fsub_s::FUNCT5) => Ok(InstructionDecoded::FsubS {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (fmul_s::FUNCT3, fmul_s::FUNCT5) => Ok(InstructionDecoded::FmulS {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (fdiv_s::FUNCT3, fdiv_s::FUNCT5) => Ok(InstructionDecoded::FdivS {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (fsgnj_s::FUNCT3, fsgnj_s::FUNCT5) => Ok(InstructionDecoded::FsgnjS {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (fsgnjn_s::FUNCT3, fsgnjn_s::FUNCT5) => Ok(InstructionDecoded::FsgnjnS {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (fsgnjx_s::FUNCT3, fsgnjx_s::FUNCT5) => Ok(InstructionDecoded::FsgnjxS {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (fmin_s::FUNCT3, fmin_s::FUNCT5) => Ok(InstructionDecoded::FminS {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (fmax_s::FUNCT3, fmax_s::FUNCT5) => Ok(InstructionDecoded::FmaxS {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (fcvt_w_s::FUNCT3, fcvt_w_s::FUNCT5) => match inst.rs2() {
+            fcvt_w_s::RS2 => Ok(InstructionDecoded::FcvtWUS {
+                rd: inst.rd(),
+                rs1: inst.rs1(),
+            }),
+            fcvt_wu_s::RS2 => Ok(InstructionDecoded::FcvtWS {
+                rd: inst.rd(),
+                rs1: inst.rs1(),
+            }),
+            _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown Floating Point instruction"),
+        }
+        (feq_s::FUNCT3, feq_s::FUNCT5) => Ok(InstructionDecoded::FeqS {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (flt_s::FUNCT3, flt_s::FUNCT5) => Ok(InstructionDecoded::FltS {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (fle_s::FUNCT3, fle_s::FUNCT5) => Ok(InstructionDecoded::FleS {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (fclass_s::FUNCT3, fclass_s::FUNCT5) => Ok(InstructionDecoded::FClassS {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+        }),
+        (fcvt_s_w::FUNCT3, fcvt_s_w::FUNCT5) => Ok(InstructionDecoded::FcvtSW {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+        }),
+        (fcvt_s_wu::FUNCT3, fcvt_s_wu::FUNCT5) => Ok(InstructionDecoded::FcvtSWU {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+        }),
+        (fmv_x_w::FUNCT3, fmv_x_w::FUNCT5) => Ok(InstructionDecoded::FmvXW {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+        }),
+        (fmv_w_x::FUNCT3, fmv_w_x::FUNCT5) => Ok(InstructionDecoded::FmvWX {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+        }),
+        _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown Single Precision Floating Point instruction"),
+    }
+}
+fn decode_double_precision(inst: &rtype::RType, funct3: InstructionSize, funct5: InstructionSize) -> Result<InstructionDecoded> {
+    match (funct3, funct5) {
+        (fadd_d::FUNCT3, fadd_d::FUNCT5) => Ok(InstructionDecoded::FaddD {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (fsub_d::FUNCT3, fsub_d::FUNCT5) => Ok(InstructionDecoded::FsubD {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (fmul_d::FUNCT3, fmul_d::FUNCT5) => Ok(InstructionDecoded::FmulD {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (fdiv_d::FUNCT3, fdiv_d::FUNCT5) => Ok(InstructionDecoded::FdivD {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (fsgnj_d::FUNCT3, fsgnj_d::FUNCT5) => Ok(InstructionDecoded::FsgnjD {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (fsgnjn_d::FUNCT3, fsgnjn_d::FUNCT5) => Ok(InstructionDecoded::FsgnjnD {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (fsgnjx_d::FUNCT3, fsgnjx_d::FUNCT5) => Ok(InstructionDecoded::FsgnjxD {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (fmin_d::FUNCT3, fmin_d::FUNCT5) => Ok(InstructionDecoded::FminD {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (fmax_d::FUNCT3, fmax_d::FUNCT5) => Ok(InstructionDecoded::FmaxD {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (fcvt_s_d::FUNCT3, fcvt_s_d::FUNCT5) => match inst.rs2() {
+            fcvt_s_d::RS2 => Ok(InstructionDecoded::FcvtSD {
+                rd: inst.rd(),
+                rs1: inst.rs1(),
+            }),
+            fcvt_d_s::RS2 => Ok(InstructionDecoded::FcvtDS {
+                rd: inst.rd(),
+                rs1: inst.rs1(),
+            }),
+            _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown Floating Point instruction"),
+        }
+        (feq_d::FUNCT3, feq_d::FUNCT5) => Ok(InstructionDecoded::FeqD {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (flt_d::FUNCT3, flt_d::FUNCT5) => Ok(InstructionDecoded::FltD {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (fle_d::FUNCT3, fle_d::FUNCT5) => Ok(InstructionDecoded::FleD {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+            rs2: inst.rs2(),
+        }),
+        (fclass_d::FUNCT3, fclass_d::FUNCT5) => Ok(InstructionDecoded::FClassD {
+            rd: inst.rd(),
+            rs1: inst.rs1(),
+        }),
+        // (fcvt_w_d::FUNCT3, fcvt_w_d::FUNCT5) => Ok(InstructionDecoded::FcvtWD {
+        //     rd: inst.rd(),
+        //     rs1: inst.rs1(),
+        // }),
+        // (fcvt_wu_d::FUNCT3, fcvt_wu_d::FUNCT5) => Ok(InstructionDecoded::FcvtWUD {
+        //     rd: inst.rd(),
+        //     rs1: inst.rs1(),
+        // }),
+        // (fcvt_d_w::FUNCT3, fcvt_d_w::FUNCT5) => Ok(InstructionDecoded::FcvtDW {
+        //     rd: inst.rd(),
+        //     rs1: inst.rs1(),
+        // }),
+        // (fcvt_d_wu::FUNCT3, fcvt_d_wu::FUNCT5) => Ok(InstructionDecoded::FcvtDUW {
+        //     rd: inst.rd(),
+        //     rs1: inst.rs1(),
+        // }),
+        // (fmv_x_d::FUNCT3, fmv_x_d::FUNCT5) => Ok(InstructionDecoded::FmvXD {
+        //     rd: inst.rd(),
+        //     rs1: inst.rs1(),
+        // }),
+        // (fmv_d_x::FUNCT3, fmv_d_x::FUNCT5) => Ok(InstructionDecoded::FmvDX {
+        //     rd: inst.rd(),
+        //     rs1: inst.rs1(),
+        // }),
+        _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown Double Precision Floating Point instruction"),
+    }
+}
+fn decode_quad_precision(_inst: &rtype::RType, _funct3: InstructionSize, _funct5: InstructionSize) -> Result<InstructionDecoded> {
+    return Err(DecodeError::UnknownInstructionFormat).context("Quad Precision Floating Point instructions are not supported yet");
+}
+
 pub fn decode_itype(inst: InstructionSize) -> Result<InstructionDecoded> {
     let iinst = itype::IType::new(inst);
-    match (iinst.opcode(), iinst.funct3(), iinst.imm()) {
-        (ARITMETIC_IMMEDIATE_MATCH, addi::FUNCT3, _) => Ok(InstructionDecoded::Addi {
-            rd: iinst.rd(),
-            rs1: iinst.rs1(),
-            imm: iinst.imm(),
-        }),
-        (ARITMETIC_IMMEDIATE_MATCH, slti::FUNCT3, _) => Ok(InstructionDecoded::Slti {
-            rd: iinst.rd(),
-            rs1: iinst.rs1(),
-            imm: iinst.imm(),
-        }),
-        (ARITMETIC_IMMEDIATE_MATCH, sltiu::FUNCT3, _) => Ok(InstructionDecoded::Sltiu {
-            rd: iinst.rd(),
-            rs1: iinst.rs1(),
-            imm: iinst.imm(),
-        }),
-        (ARITMETIC_IMMEDIATE_MATCH, xori::FUNCT3, _) => Ok(InstructionDecoded::Xori {
-            rd: iinst.rd(),
-            rs1: iinst.rs1(),
-            imm: iinst.imm(),
-        }),
-        (ARITMETIC_IMMEDIATE_MATCH, ori::FUNCT3, _) => Ok(InstructionDecoded::Ori {
-            rd: iinst.rd(),
-            rs1: iinst.rs1(),
-            imm: iinst.imm(),
-        }),
-        (ARITMETIC_IMMEDIATE_MATCH, andi::FUNCT3, _) => Ok(InstructionDecoded::Andi {
-            rd: iinst.rd(),
-            rs1: iinst.rs1(),
-            imm: iinst.imm(),
-        }),
-        imm @ (ARITMETIC_IMMEDIATE_MATCH, slli::FUNCT3, _) if (imm.2 >> 5) == slli::IMM => {
-            Ok(InstructionDecoded::Slli {
-                rd: iinst.rd(),
-                rs1: iinst.rs1(),
-                imm: get_bits(imm.2, 5, 0),
-            })
-        }
-        imm @ (ARITMETIC_IMMEDIATE_MATCH, srli::FUNCT3, _) if (imm.2 >> 5) == srli::IMM => {
-            Ok(InstructionDecoded::Srli {
-                rd: iinst.rd(),
-                rs1: iinst.rs1(),
-                imm: get_bits(imm.2, 5, 0),
-            })
-        }
-        imm @ (ARITMETIC_IMMEDIATE_MATCH, srai::FUNCT3, _) if (imm.2 >> 5) == srai::IMM => {
-            Ok(InstructionDecoded::Srai {
-                rd: iinst.rd(),
-                rs1: iinst.rs1(),
-                imm: get_bits(imm.2, 5, 0),
-            })
+    match iinst.opcode() {
+        ARITMETIC_IMMEDIATE_MATCH => {
+            let funct5 = get_bits(iinst.imm(), 2, 5);
+            let imm = get_bits(iinst.imm(), 5, 0);
+            match (iinst.funct3(), funct5) {
+                (addi::FUNCT3, _) => Ok(InstructionDecoded::Addi {
+                    rd: iinst.rd(),
+                    rs1: iinst.rs1(),
+                    imm: iinst.imm(),
+                }),
+                (slti::FUNCT3, _) => Ok(InstructionDecoded::Slti {
+                    rd: iinst.rd(),
+                    rs1: iinst.rs1(),
+                    imm: iinst.imm(),
+                }),
+                (sltiu::FUNCT3, _) => Ok(InstructionDecoded::Sltiu {
+                    rd: iinst.rd(),
+                    rs1: iinst.rs1(),
+                    imm: iinst.imm(),
+                }),
+                (xori::FUNCT3, _) => Ok(InstructionDecoded::Xori {
+                    rd: iinst.rd(),
+                    rs1: iinst.rs1(),
+                    imm: iinst.imm(),
+                }),
+                (ori::FUNCT3, _) => Ok(InstructionDecoded::Ori {
+                    rd: iinst.rd(),
+                    rs1: iinst.rs1(),
+                    imm: iinst.imm(),
+                }),
+                (andi::FUNCT3, _) => Ok(InstructionDecoded::Andi {
+                    rd: iinst.rd(),
+                    rs1: iinst.rs1(),
+                    imm: iinst.imm(),
+                }),
+                (slli::FUNCT3, slli::IMM) => {
+                    Ok(InstructionDecoded::Slli {
+                        rd: iinst.rd(),
+                        rs1: iinst.rs1(),
+                        imm
+                    })
+                }
+                (srli::FUNCT3, srli::IMM) => {
+                    Ok(InstructionDecoded::Srli {
+                        rd: iinst.rd(),
+                        rs1: iinst.rs1(),
+                        imm,
+                    })
+                }
+                (srai::FUNCT3, srai::IMM) => {
+                    Ok(InstructionDecoded::Srai {
+                        rd: iinst.rd(),
+                        rs1: iinst.rs1(),
+                        imm,
+                    })
+                },
+                _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown Arithmetic immediate I-Type instruction")
+            }
         }
         // Load
-        (LOAD_MATCH, lb::FUNCT3, _) => Ok(InstructionDecoded::Lb {
-            rd: iinst.rd(),
-            rs1: iinst.rs1(),
-            imm: iinst.imm(),
-        }),
-        (LOAD_MATCH, lh::FUNCT3, _) => Ok(InstructionDecoded::Lh {
-            rd: iinst.rd(),
-            rs1: iinst.rs1(),
-            imm: iinst.imm(),
-        }),
-        (LOAD_MATCH, lw::FUNCT3, _) => Ok(InstructionDecoded::Lw {
-            rd: iinst.rd(),
-            rs1: iinst.rs1(),
-            imm: iinst.imm(),
-        }),
-        (LOAD_MATCH, lbu::FUNCT3, _) => Ok(InstructionDecoded::Lbu {
-            rd: iinst.rd(),
-            rs1: iinst.rs1(),
-            imm: iinst.imm(),
-        }),
-        (LOAD_MATCH, lhu::FUNCT3, _) => Ok(InstructionDecoded::Lhu {
-            rd: iinst.rd(),
-            rs1: iinst.rs1(),
-            imm: iinst.imm(),
-        }),
-        (JALR_MATCH, jalr::FUNCT3, _) => Ok(InstructionDecoded::Jalr {
-            rd: iinst.rd(),
-            rs1: iinst.rs1(),
-            imm: iinst.imm(),
-        }),
-        (FENCE_MATCH, fence::FUNCT3, _) => {
-            let pred = get_bits(iinst.imm(), 4, 0);
-            let succ = get_bits(iinst.imm() >> 4, 4, 0);
-            Ok(InstructionDecoded::Fence { pred, succ })
+        LOAD_MATCH => match iinst.funct3() {
+            lb::FUNCT3 => Ok(InstructionDecoded::Lb {
+                rd: iinst.rd(),
+                rs1: iinst.rs1(),
+                imm: iinst.imm(),
+            }),
+            lh::FUNCT3 => Ok(InstructionDecoded::Lh {
+                rd: iinst.rd(),
+                rs1: iinst.rs1(),
+                imm: iinst.imm(),
+            }),
+            lw::FUNCT3 => Ok(InstructionDecoded::Lw {
+                rd: iinst.rd(),
+                rs1: iinst.rs1(),
+                imm: iinst.imm(),
+            }),
+            lbu::FUNCT3 => Ok(InstructionDecoded::Lbu {
+                rd: iinst.rd(),
+                rs1: iinst.rs1(),
+                imm: iinst.imm(),
+            }),
+            lhu::FUNCT3 => Ok(InstructionDecoded::Lhu {
+                rd: iinst.rd(),
+                rs1: iinst.rs1(),
+                imm: iinst.imm(),
+            }),
+            _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown Load I-Type instruction")
         }
-        (FENCE_MATCH, fence_i::FUNCT3, _) => {
+        FLOAD_MATCH => match iinst.funct3() {
+            flw::FUNCT3 => Ok(InstructionDecoded::Flw {
+                rd: iinst.rd(),
+                rs1: iinst.rs1(),
+                imm: iinst.imm(),
+            }),
+            fld::FUNCT3 => Ok(InstructionDecoded::Fld {
+                rd: iinst.rd(),
+                rs1: iinst.rs1(),
+                imm: iinst.imm(),
+            }),
+            _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown Float Load I-Type instruction")
+        }
+        JALR_MATCH if iinst.funct3() == jalr::FUNCT3 => Ok(InstructionDecoded::Jalr {
+            rd: iinst.rd(),
+            rs1: iinst.rs1(),
+            imm: iinst.imm(),
+        }),
+        FENCE_MATCH => {
             let pred = get_bits(iinst.imm(), 4, 0);
             let succ = get_bits(iinst.imm(), 4, 4);
-            Ok(InstructionDecoded::FenceI { pred, succ })
+            match iinst.funct3() {
+                fence::FUNCT3 => Ok(InstructionDecoded::Fence { pred, succ }),
+                fence_i::FUNCT3 => Ok(InstructionDecoded::FenceI { pred, succ }),
+                _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown Fence I-Type instruction")
+            }
         }
-        (CSR_MATCH, csrrw::FUNCT3, _) => Ok(InstructionDecoded::CsrRw {
-            rd: iinst.rd(),
-            rs1: iinst.rs1(),
-            imm: iinst.uimm(),
-        }),
-        (CSR_MATCH, csrrs::FUNCT3, _) => Ok(InstructionDecoded::CsrRs {
-            rd: iinst.rd(),
-            rs1: iinst.rs1(),
-            imm: iinst.uimm(),
-        }),
-        (CSR_MATCH, csrrc::FUNCT3, _) => Ok(InstructionDecoded::CsrRc {
-            rd: iinst.rd(),
-            rs1: iinst.rs1(),
-            imm: iinst.uimm(),
-        }),
-        (CSR_MATCH, csrrwi::FUNCT3, _) => Ok(InstructionDecoded::CsrRwi {
-            rd: iinst.rd(),
-            rs1: iinst.rs1(),
-            imm: iinst.uimm(),
-        }),
-        (CSR_MATCH, csrrsi::FUNCT3, _) => Ok(InstructionDecoded::CsrRsi {
-            rd: iinst.rd(),
-            rs1: iinst.rs1(),
-            imm: iinst.uimm(),
-        }),
-        (CSR_MATCH, csrrci::FUNCT3, _) => Ok(InstructionDecoded::CsrRci {
-            rd: iinst.rd(),
-            rs1: iinst.rs1(),
-            imm: iinst.uimm(),
-        }),
-        // e-insts (ebreak, ecall)
-        (CSR_MATCH, sfencevma::FUNCT3, sfencevma::IMM) => Ok(InstructionDecoded::SFenceVma),
-        (CSR_MATCH, ebreak::FUNCT3, ebreak::IMM) => Ok(InstructionDecoded::EBreak),
-        (CSR_MATCH, ecall::FUNCT3, ecall::IMM) => Ok(InstructionDecoded::ECall),
-        (CSR_MATCH, mret::FUNCT3, mret::IMM) => Ok(InstructionDecoded::MRet),
-        (CSR_MATCH, sret::FUNCT3, sret::IMM) => Ok(InstructionDecoded::SRet),
+        CSR_MATCH => {
+            match (iinst.funct3(), iinst.imm()) {
+                (csrrw::FUNCT3, _) => Ok(InstructionDecoded::CsrRw {
+                    rd: iinst.rd(),
+                    rs1: iinst.rs1(),
+                    imm: iinst.uimm(),
+                }),
+                (csrrs::FUNCT3, _) => Ok(InstructionDecoded::CsrRs {
+                    rd: iinst.rd(),
+                    rs1: iinst.rs1(),
+                    imm: iinst.uimm(),
+                }),
+                (csrrc::FUNCT3, _) => Ok(InstructionDecoded::CsrRc {
+                    rd: iinst.rd(),
+                    rs1: iinst.rs1(),
+                    imm: iinst.uimm(),
+                }),
+                (csrrwi::FUNCT3, _) => Ok(InstructionDecoded::CsrRwi {
+                    rd: iinst.rd(),
+                    rs1: iinst.rs1(),
+                    imm: iinst.uimm(),
+                }),
+                (csrrsi::FUNCT3, _) => Ok(InstructionDecoded::CsrRsi {
+                    rd: iinst.rd(),
+                    rs1: iinst.rs1(),
+                    imm: iinst.uimm(),
+                }),
+                (csrrci::FUNCT3, _) => Ok(InstructionDecoded::CsrRci {
+                    rd: iinst.rd(),
+                    rs1: iinst.rs1(),
+                    imm: iinst.uimm(),
+                }),
+                // e-insts (ebreak, ecall)
+                (sfencevma::FUNCT3, sfencevma::IMM) => Ok(InstructionDecoded::SFenceVma),
+                (ebreak::FUNCT3, ebreak::IMM) => Ok(InstructionDecoded::EBreak),
+                (ecall::FUNCT3, ecall::IMM) => Ok(InstructionDecoded::ECall),
+                (mret::FUNCT3, mret::IMM) => Ok(InstructionDecoded::MRet),
+                (sret::FUNCT3, sret::IMM) => Ok(InstructionDecoded::SRet),
+
+                _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown Csr I-Type instruction")
+            }
+        }
         // TODO: SFenceVMA
         _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown I-Type instruction"),
     }
@@ -336,23 +512,39 @@ pub fn decode_itype(inst: InstructionSize) -> Result<InstructionDecoded> {
 
 pub fn decode_stype(inst: InstructionSize) -> Result<InstructionDecoded> {
     let sinst = stype::SType::new(inst);
-    match sinst.funct3() {
-        sb::FUNCT3 => Ok(InstructionDecoded::Sb {
-            rs1: sinst.rs1(),
-            rs2: sinst.rs2(),
-            imm: sinst.imm(),
-        }),
-        sh::FUNCT3 => Ok(InstructionDecoded::Sh {
-            rs1: sinst.rs1(),
-            rs2: sinst.rs2(),
-            imm: sinst.imm(),
-        }),
-        sw::FUNCT3 => Ok(InstructionDecoded::Sw {
-            rs1: sinst.rs1(),
-            rs2: sinst.rs2(),
-            imm: sinst.imm(),
-        }),
-        _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown S-Type instruction"),
+    match sinst.opcode() {
+        STORE_MATCH => match sinst.funct3() {
+            sb::FUNCT3 => Ok(InstructionDecoded::Sb {
+                rs1: sinst.rs1(),
+                rs2: sinst.rs2(),
+                imm: sinst.imm(),
+            }),
+            sh::FUNCT3 => Ok(InstructionDecoded::Sh {
+                rs1: sinst.rs1(),
+                rs2: sinst.rs2(),
+                imm: sinst.imm(),
+            }),
+            sw::FUNCT3 => Ok(InstructionDecoded::Sw {
+                rs1: sinst.rs1(),
+                rs2: sinst.rs2(),
+                imm: sinst.imm(),
+            }),
+            _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown S-Type instruction"),
+        }
+        FSTORE_MATCH => match sinst.funct3() {
+            fsw::FUNCT3 => Ok(InstructionDecoded::Fsw {
+                rs1: sinst.rs1(),
+                rs2: sinst.rs2(),
+                imm: sinst.imm(),
+            }),
+            fsd::FUNCT3 => Ok(InstructionDecoded::Fsd {
+                rs1: sinst.rs1(),
+                rs2: sinst.rs2(),
+                imm: sinst.imm(),
+            }),
+            _ => Err(DecodeError::UnknownInstructionFormat).context("Unknown S-Type instruction"),
+        }
+        _ => return Err(DecodeError::UnknownInstructionFormat).context("Unknown S-Type instruction"),
     }
 }
 
@@ -430,10 +622,10 @@ pub fn try_decode(inst: InstructionSize) -> Result<InstructionDecoded> {
 
     let fmt = match inst & OPCODE_MASK {
         FLOATING_POINT_MATCH | ATOMIC_MATCH | ARITMETIC_REGISTER_MATCH => InstructionFormat::RType,
-        STORE_MATCH => InstructionFormat::SType,
+        FSTORE_MATCH | STORE_MATCH => InstructionFormat::SType,
         BRANCH_MATCH => InstructionFormat::BType,
         JAL_MATCH => InstructionFormat::JType,
-        ARITMETIC_IMMEDIATE_MATCH | FENCE_MATCH | LOAD_MATCH | CSR_MATCH | JALR_MATCH => {
+        FLOAD_MATCH | ARITMETIC_IMMEDIATE_MATCH | FENCE_MATCH | LOAD_MATCH | CSR_MATCH | JALR_MATCH => {
             InstructionFormat::IType
         }
         LUI_MATCH | AUIPC_MATCH => InstructionFormat::UType,
