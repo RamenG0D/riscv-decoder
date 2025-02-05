@@ -344,6 +344,22 @@ pub enum InstructionDecoded {
         rd: InstructionSize,
         rs1: InstructionSize,
     },
+    FcvtWD {
+        rd: InstructionSize,
+        rs1: InstructionSize,
+    },
+    FcvtWUD {
+        rd: InstructionSize,
+        rs1: InstructionSize,
+    },
+    FcvtDW {
+        rd: InstructionSize,
+        rs1: InstructionSize,
+    },
+    FcvtDWU {
+        rd: InstructionSize,
+        rs1: InstructionSize,
+    },
     FmvXW {
         rd: InstructionSize,
         rs1: InstructionSize,
@@ -373,6 +389,32 @@ pub enum InstructionDecoded {
     },
 
     // D Extension
+    FmaddD {
+        rd: InstructionSize,
+        rs1: InstructionSize,
+        rs2: InstructionSize,
+        rs3: InstructionSize,
+    },
+	FmsubD {
+		rd: InstructionSize,
+		rs1: InstructionSize,
+		rs2: InstructionSize,
+		rs3: InstructionSize,
+	},
+
+	FnmaddD {
+		rd: InstructionSize,
+		rs1: InstructionSize,
+		rs2: InstructionSize,
+		rs3: InstructionSize,
+	},
+	FnmsubD {
+		rd: InstructionSize,
+		rs1: InstructionSize,
+		rs2: InstructionSize,
+		rs3: InstructionSize,
+	},
+
     Fld {
         rd: InstructionSize,
         rs1: InstructionSize,
@@ -388,14 +430,6 @@ pub enum InstructionDecoded {
         rs1: InstructionSize,
     },
     FcvtDS {
-        rd: InstructionSize,
-        rs1: InstructionSize,
-    },
-    FmvXD {
-        rd: InstructionSize,
-        rs1: InstructionSize,
-    },
-    FmvDX {
         rd: InstructionSize,
         rs1: InstructionSize,
     },
@@ -927,11 +961,7 @@ impl Display for InstructionDecoded {
             InstructionDecoded::FenceI { pred, succ } => {
                 write!(f, "fence.i {}, {}", *pred as i32, *succ as i32)
             }
-            InstructionDecoded::Flw {
-                rd,
-                rs1,
-                imm,
-            } => {
+            InstructionDecoded::Flw { rd, rs1, imm } => {
                 write!(
                     f,
                     "flw {}, {}({})",
@@ -1237,31 +1267,45 @@ impl Display for InstructionDecoded {
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize]
                 )
             }
-            Self::FcvtDS { rd, rs1 } => {
+            InstructionDecoded::FcvtWD { rd, rs1 } => {
+                write!(
+                    f,
+                    "fcvt.w.d {}, {}",
+                    REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize]
+                )
+            }
+            InstructionDecoded::FcvtWUD { rd, rs1 } => {
+                write!(
+                    f,
+                    "fcvt.wu.d {}, {}",
+                    REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize]
+                )
+            }
+            InstructionDecoded::FcvtDW { rd, rs1 } => {
+                write!(
+                    f,
+                    "fcvt.d.w {}, {}",
+                    REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize]
+                )
+            }
+            InstructionDecoded::FcvtDWU { rd, rs1 } => {
+                write!(
+                    f,
+                    "fcvt.d.wu {}, {}",
+                    REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize]
+                )
+            }
+            InstructionDecoded::FcvtDS { rd, rs1 } => {
                 write!(
                     f,
                     "fcvt.d.s {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize]
                 )
             }
-            Self::FcvtSD { rd, rs1 } => {
+            InstructionDecoded::FcvtSD { rd, rs1 } => {
                 write!(
                     f,
                     "fcvt.s.d {}, {}",
-                    REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize]
-                )
-            }
-            InstructionDecoded::FmvXD { rd, rs1 } => {
-                write!(
-                    f,
-                    "fmv.x.d {}, {}",
-                    REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize]
-                )
-            }
-            InstructionDecoded::FmvDX { rd, rs1 } => {
-                write!(
-                    f,
-                    "fmv.d.x {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize]
                 )
             }
@@ -1491,6 +1535,46 @@ impl Display for InstructionDecoded {
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], *shamt as i32
                 )
             }
+            InstructionDecoded::FmaddD { rd, rs1, rs2, rs3 } => {
+                write!(
+                    f,
+                    "fmadd.d {}, {}, {}, {}",
+                    REG_NAMES[*rd as usize],
+                    REG_NAMES[*rs1 as usize],
+                    REG_NAMES[*rs2 as usize],
+                    REG_NAMES[*rs3 as usize]
+                )
+            }
+			InstructionDecoded::FmsubD { rd, rs1, rs2, rs3 } => {
+				write!(
+					f,
+					"fmsub.d {}, {}, {}, {}",
+					REG_NAMES[*rd as usize],
+					REG_NAMES[*rs1 as usize],
+					REG_NAMES[*rs2 as usize],
+					REG_NAMES[*rs3 as usize]
+				)
+			}
+			InstructionDecoded::FnmsubD { rd, rs1, rs2, rs3 } => {
+				write!(
+					f,
+					"fnmsub.d {}, {}, {}, {}",
+					REG_NAMES[*rd as usize],
+					REG_NAMES[*rs1 as usize],
+					REG_NAMES[*rs2 as usize],
+					REG_NAMES[*rs3 as usize]
+				)
+			}
+			InstructionDecoded::FnmaddD { rd, rs1, rs2, rs3 } => {
+				write!(
+					f,
+					"fnmadd.d {}, {}, {}, {}",
+					REG_NAMES[*rd as usize],
+					REG_NAMES[*rs1 as usize],
+					REG_NAMES[*rs2 as usize],
+					REG_NAMES[*rs3 as usize]
+				)
+			}
         }
     }
 }

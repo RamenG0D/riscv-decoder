@@ -274,23 +274,18 @@ instructions! {
         pub const FUNCT3: u32 = 2;
     }
     fadd_s {
-        pub const FUNCT3: u32 = 7;
         pub const FUNCT5: u32 = 0;
     }
     fsub_s {
-        pub const FUNCT3: u32 = 7;
         pub const FUNCT5: u32 = 1;
     }
     fmul_s {
-        pub const FUNCT3: u32 = 7;
         pub const FUNCT5: u32 = 2;
     }
     fdiv_s {
-        pub const FUNCT3: u32 = 7;
         pub const FUNCT5: u32 = 3;
     }
     fsqrt_s {
-        pub const FUNCT3: u32 = 7;
         pub const FUNCT5: u32 = 11;
     }
     fsgnj_s {
@@ -314,33 +309,26 @@ instructions! {
         pub const FUNCT5: u32 = 5;
     }
     fcvt_w_s {
-        pub const FUNCT3: u32 = 1;
         pub const FUNCT5: u32 = 24;
         pub const RS2: u32 = 0;
     }
     fcvt_wu_s {
-        pub const FUNCT3: u32 = 1;
         pub const FUNCT5: u32 = 24;
         pub const RS2: u32 = 1;
     }
     fcvt_s_w {
-        pub const FUNCT3: u32 = 7;
         pub const FUNCT5: u32 = 26;
     }
     fcvt_s_wu {
-        pub const FUNCT3: u32 = 7;
         pub const FUNCT5: u32 = 27;
     }
     fmv_x_w {
-        pub const FUNCT3: u32 = 0;
-        pub const FUNCT5: u32 = 28;
+		pub const FUNCT5: u32 = 28;
     }
-    fmv_w_x {
-        pub const FUNCT3: u32 = 0;
-        pub const FUNCT5: u32 = 30;
-    }
+	fmv_w_x {
+		pub const FUNCT5: u32 = 30;
+	}
     fle_s {
-        pub const FUNCT3: u32 = 0;
         pub const FUNCT5: u32 = 20;
     }
     flt_s {
@@ -357,6 +345,8 @@ instructions! {
     }
 
     // D extention instructions
+    fmadd_d {
+    }
     fld {
         pub const FUNCT3: u32 = 3;
     }
@@ -364,23 +354,18 @@ instructions! {
         pub const FUNCT3: u32 = 3;
     }
     fadd_d {
-        pub const FUNCT3: u32 = 7;
         pub const FUNCT5: u32 = 0;
     }
     fsub_d {
-        pub const FUNCT3: u32 = 7;
         pub const FUNCT5: u32 = 1;
     }
     fmul_d {
-        pub const FUNCT3: u32 = 7;
         pub const FUNCT5: u32 = 2;
     }
     fdiv_d {
-        pub const FUNCT3: u32 = 7;
         pub const FUNCT5: u32 = 3;
     }
     fsqrt_d {
-        pub const FUNCT3: u32 = 7;
         pub const FUNCT5: u32 = 11;
     }
     fsgnj_d {
@@ -404,32 +389,26 @@ instructions! {
         pub const FUNCT5: u32 = 5;
     }
     fcvt_d_s {
-        pub const FUNCT3: u32 = 7;
         pub const FUNCT5: u32 = 8;
         pub const RS2: u32 = 0;
     }
     fcvt_s_d {
-        pub const FUNCT3: u32 = 7;
         pub const FUNCT5: u32 = 8;
         pub const RS2: u32 = 1;
     }
     fcvt_d_w {
-        pub const FUNCT3: u32 = 7;
         pub const FUNCT5: u32 = 26;
         pub const RS2: u32 = 0;
     }
     fcvt_d_wu {
-        pub const FUNCT3: u32 = 7;
         pub const FUNCT5: u32 = 26;
         pub const RS2: u32 = 1;
     }
     fcvt_w_d {
-        pub const FUNCT3: u32 = 7;
         pub const FUNCT5: u32 = 24;
         pub const RS2: u32 = 0;
     }
     fcvt_wu_d {
-        pub const FUNCT3: u32 = 7;
         pub const FUNCT5: u32 = 24;
         pub const RS2: u32 = 1;
     }
@@ -540,15 +519,16 @@ pub const FSTORE_MATCH: InstructionSize = 39;
 pub const STORE_MATCH: InstructionSize = 35;
 pub const ARITMETIC_REGISTER_MATCH: InstructionSize = 51;
 pub const FLOAT_MATCH: InstructionSize = 83;
-
-// TODO: maybe this is correct, check it
 pub const FLOATING_POINT_MATCH: InstructionSize = 83;
-
 pub const BRANCH_MATCH: InstructionSize = 99;
 pub const CSR_MATCH: InstructionSize = 115;
 pub const JALR_MATCH: InstructionSize = 103;
 pub const JAL_MATCH: InstructionSize = 111;
 pub const ATOMIC_MATCH: InstructionSize = 47;
+pub const FMADDD_MATCH: InstructionSize = 67;
+pub const FMSUBD_MATCH: InstructionSize = 71;
+pub const FNMADDD_MATCH: InstructionSize = 79;
+pub const FNMSUBD_MATCH: InstructionSize = 75;
 
 pub mod rtype {
     use super::InstructionSize;
