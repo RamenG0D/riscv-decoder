@@ -699,10 +699,6 @@ pub mod utype {
         pub fn new(inst: InstructionSize) -> Self {
             Self(inst)
         }
-
-        // pub fn imm(&self) -> InstructionSize {
-        //     self.imm1() as InstructionSize
-        // }
     }
 
     #[test]

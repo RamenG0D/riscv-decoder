@@ -418,9 +418,9 @@ pub fn decode_itype(inst: InstructionSize) -> Result<InstructionDecoded> {
     let iinst = itype::IType::new(inst);
     match iinst.opcode() {
         ARITMETIC_IMMEDIATE_MATCH => {
-            let funct5 = get_bits(iinst.imm(), 2, 5);
-            let imm = get_bits(iinst.imm(), 5, 0);
-            match (iinst.funct3(), funct5) {
+			let imm = get_bits(iinst.imm(), 5, 0); // remove bits [11:5]
+			let f5 = get_bits(iinst.imm(), 6, 5); // get bits [11:5] for the funct5
+            match (iinst.funct3(), f5) {
                 (addi::FUNCT3, _) => Ok(InstructionDecoded::Addi {
                     rd: iinst.rd(),
                     rs1: iinst.rs1(),
@@ -828,6 +828,16 @@ decode_test!(
 		rs1: 15,
 		rs2: 0,
 		rs3: 11
+	}
+);
+
+decode_test!(
+	srai,
+	0x4010d093 /* srai ra, ra, 0x1 */,
+	InstructionDecoded::Srai {
+		rd: 1,
+		rs1: 1,
+		imm: 1
 	}
 );
 
