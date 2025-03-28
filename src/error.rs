@@ -1,15 +1,13 @@
-use std::fmt::{Display, Formatter, Result};
-
 use thiserror::Error;
+
+use crate::instructions::InstructionFormat;
 
 #[derive(Error, Debug, Clone, PartialEq, Eq)]
 pub enum DecodeError {
-    UnknownInstruction,
-    UnknownInstructionFormat,
-}
-
-impl Display for DecodeError {
-    fn fmt(&self, f: &mut Formatter) -> Result {
-        write!(f, "{:?}", self)
-    }
+	#[error("Invalid instruction {inst:#08X}")]
+	InvalidInstruction { inst: u32 },
+	#[error("Invalid instruction format {format:?}")]
+    UnknownInstructionFormat {
+		format: InstructionFormat
+	},
 }
