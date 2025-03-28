@@ -1,6 +1,7 @@
 use crate::bit_ops::*;
 use crate::{decoded_inst::InstructionDecoded, error::DecodeError, instructions::*};
 use anyhow::{Context, Result};
+use cached::proc_macro::cached;
 use paste::paste;
 
 const OPCODE_MASK: InstructionSize = crate::bit_ops::create_mask(7);
@@ -104,6 +105,7 @@ pub fn decode_rtype(inst: InstructionSize) -> Result<InstructionDecoded> {
                     rs1: inst.rs1(),
                     rs2: inst.rs2(),
                 }),
+
                 _ => Err(DecodeError::UnknownInstructionFormat)
                     .context("Unknown Arithmetic Register instruction (R-type)"),
             }
@@ -120,15 +122,13 @@ pub fn decode_rtype(inst: InstructionSize) -> Result<InstructionDecoded> {
                     rl,
                     aq,
                 }),
-                _ => {
-                    Err(DecodeError::UnknownInstructionFormat).context("Unknown Atomic instruction")
-                }
+                _ => Err(DecodeError::UnknownInstructionFormat)
+						.context("Unknown Atomic instruction"),
             }
         }
         FLOATING_POINT_MATCH => {
             let funct5 = get_bits(inst.funct7(), 5, 2);
             let fmt = get_bits(inst.funct7(), 2, 0) as u8;
-            // assert!(fmt == 0, "the fmt of an inst cannot be non 0 because we only support single precision floating point instructions currently!");
             const SINGLE_PRECISION_MATCH: u8 = 0;
             const DOUBLE_PRECISION_MATCH: u8 = 1;
             const QUAD_PRECISION_MATCH: u8 = 3;
@@ -676,6 +676,7 @@ pub fn decode_jtype(inst: InstructionSize) -> Result<InstructionDecoded> {
     }
 }
 
+#[cached(result = true)]
 pub fn try_decode(inst: InstructionSize) -> Result<InstructionDecoded> {
     // if its a compressed inst then dont bother with regular decoding, instead decode it as compressed and return the result
     match inst & COMPRESSED_MASK {
