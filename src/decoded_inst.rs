@@ -2,8 +2,8 @@ use std::fmt::Display;
 
 use crate::instructions::InstructionSize;
 
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub enum InstructionDecoded {
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub enum Instruction {
     Lb {
         rd: InstructionSize,
         rs1: InstructionSize,
@@ -652,7 +652,7 @@ macro_rules! print_csr {
     };
 }
 
-impl Display for InstructionDecoded {
+impl Display for Instruction {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         const REG_NAMES: [&str; 32] = [
             "zero", "ra", "sp", "gp", "tp", "t0", "t1", "t2", "s0", "s1", "a0", "a1", "a2", "a3",
@@ -661,251 +661,251 @@ impl Display for InstructionDecoded {
         ];
 
         match self {
-            InstructionDecoded::Lb { rd, rs1, imm } => {
+            Instruction::Lb { rd, rs1, imm } => {
                 write!(
                     f,
                     "lb {}, {}({})",
                     REG_NAMES[*rd as usize], *imm as i32, REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::Lh { rd, rs1, imm } => {
+            Instruction::Lh { rd, rs1, imm } => {
                 write!(
                     f,
                     "lh {}, {}({})",
                     REG_NAMES[*rd as usize], *imm as i32, REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::Lw { rd, rs1, imm } => {
+            Instruction::Lw { rd, rs1, imm } => {
                 write!(
                     f,
                     "lw {}, {}({})",
                     REG_NAMES[*rd as usize], *imm as i32, REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::Lbu { rd, rs1, imm } => {
+            Instruction::Lbu { rd, rs1, imm } => {
                 write!(
                     f,
                     "lbu {}, {}({})",
                     REG_NAMES[*rd as usize], *imm as i32, REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::Lhu { rd, rs1, imm } => {
+            Instruction::Lhu { rd, rs1, imm } => {
                 write!(
                     f,
                     "lhu {}, {}({})",
                     REG_NAMES[*rd as usize], *imm as i32, REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::Lwu { rd, rs1, imm } => {
+            Instruction::Lwu { rd, rs1, imm } => {
                 write!(
                     f,
                     "lwu {}, {}({})",
                     REG_NAMES[*rd as usize], *imm as i32, REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::Addi { rd, rs1, imm } => {
+            Instruction::Addi { rd, rs1, imm } => {
                 write!(
                     f,
                     "addi {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], *imm as i32
                 )
             }
-            InstructionDecoded::Slli { rd, rs1, imm } => {
+            Instruction::Slli { rd, rs1, imm } => {
                 write!(
                     f,
                     "slli {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], *imm as i32
                 )
             }
-            InstructionDecoded::Slti { rd, rs1, imm } => {
+            Instruction::Slti { rd, rs1, imm } => {
                 write!(
                     f,
                     "slti {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], *imm as i32
                 )
             }
-            InstructionDecoded::Sltiu { rd, rs1, imm } => {
+            Instruction::Sltiu { rd, rs1, imm } => {
                 write!(
                     f,
                     "sltiu {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], *imm as i32
                 )
             }
-            InstructionDecoded::Xori { rd, rs1, imm } => {
+            Instruction::Xori { rd, rs1, imm } => {
                 write!(
                     f,
                     "xori {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], *imm as i32
                 )
             }
-            InstructionDecoded::Srli { rd, rs1, imm } => {
+            Instruction::Srli { rd, rs1, imm } => {
                 write!(
                     f,
                     "srli {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], *imm as i32
                 )
             }
-            InstructionDecoded::Srai { rd, rs1, imm } => {
+            Instruction::Srai { rd, rs1, imm } => {
                 write!(
                     f,
                     "srai {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], *imm as i32
                 )
             }
-            InstructionDecoded::Ori { rd, rs1, imm } => {
+            Instruction::Ori { rd, rs1, imm } => {
                 write!(
                     f,
                     "ori {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], *imm as i32
                 )
             }
-            InstructionDecoded::Andi { rd, rs1, imm } => {
+            Instruction::Andi { rd, rs1, imm } => {
                 write!(
                     f,
                     "andi {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], *imm as i32
                 )
             }
-            InstructionDecoded::AuiPc { rd, imm } => {
+            Instruction::AuiPc { rd, imm } => {
                 write!(f, "auipc {}, {}", REG_NAMES[*rd as usize], *imm as i32)
             }
-            InstructionDecoded::Sb { rs1, rs2, imm } => {
+            Instruction::Sb { rs1, rs2, imm } => {
                 write!(
                     f,
                     "sb {}, {}({})",
                     REG_NAMES[*rs2 as usize], *imm as i32, REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::Sh { rs1, rs2, imm } => {
+            Instruction::Sh { rs1, rs2, imm } => {
                 write!(
                     f,
                     "sh {}, {}({})",
                     REG_NAMES[*rs2 as usize], *imm as i32, REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::Sw { rs1, rs2, imm } => {
+            Instruction::Sw { rs1, rs2, imm } => {
                 write!(
                     f,
                     "sw {}, {}({})",
                     REG_NAMES[*rs2 as usize], *imm as i32, REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::Add { rd, rs1, rs2 } => {
+            Instruction::Add { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "add {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::Sub { rd, rs1, rs2 } => {
+            Instruction::Sub { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "sub {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::Sll { rd, rs1, rs2 } => {
+            Instruction::Sll { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "sll {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::Slt { rd, rs1, rs2 } => {
+            Instruction::Slt { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "slt {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::Sltu { rd, rs1, rs2 } => {
+            Instruction::Sltu { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "sltu {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::Xor { rd, rs1, rs2 } => {
+            Instruction::Xor { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "xor {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::Srl { rd, rs1, rs2 } => {
+            Instruction::Srl { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "srl {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::Sra { rd, rs1, rs2 } => {
+            Instruction::Sra { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "sra {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::Or { rd, rs1, rs2 } => {
+            Instruction::Or { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "or {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::And { rd, rs1, rs2 } => {
+            Instruction::And { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "and {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::Lui { rd, imm } => {
+            Instruction::Lui { rd, imm } => {
                 write!(f, "lui {}, {:#X}", REG_NAMES[*rd as usize], *imm)
             }
-            InstructionDecoded::Beq { rs1, rs2, imm } => {
+            Instruction::Beq { rs1, rs2, imm } => {
                 write!(
                     f,
                     "beq {}, {}, {}",
                     REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize], *imm as i32
                 )
             }
-            InstructionDecoded::Bne { rs1, rs2, imm } => {
+            Instruction::Bne { rs1, rs2, imm } => {
                 write!(
                     f,
                     "bne {}, {}, {}",
                     REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize], *imm as i32
                 )
             }
-            InstructionDecoded::Blt { rs1, rs2, imm } => {
+            Instruction::Blt { rs1, rs2, imm } => {
                 write!(
                     f,
                     "blt {}, {}, {}",
                     REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize], *imm as i32
                 )
             }
-            InstructionDecoded::Bge { rs1, rs2, imm } => {
+            Instruction::Bge { rs1, rs2, imm } => {
                 write!(
                     f,
                     "bge {}, {}, {}",
                     REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize], *imm as i32
                 )
             }
-            InstructionDecoded::Bltu { rs1, rs2, imm } => {
+            Instruction::Bltu { rs1, rs2, imm } => {
                 write!(
                     f,
                     "bltu {}, {}, {}",
                     REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize], *imm as i32
                 )
             }
-            InstructionDecoded::Bgeu { rs1, rs2, imm } => {
+            Instruction::Bgeu { rs1, rs2, imm } => {
                 write!(
                     f,
                     "bgeu {}, {}, {}",
                     REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize], *imm as i32
                 )
             }
-            InstructionDecoded::Jalr { rd, rs1, imm } => {
+            Instruction::Jalr { rd, rs1, imm } => {
                 let args = match (*imm as i32 == 0, rd == rs1) {
                     (true, true) => format!("{}", REG_NAMES[*rd as usize]),
                     (true, false) => {
@@ -919,77 +919,77 @@ impl Display for InstructionDecoded {
                 };
                 write!(f, "jalr {args}")
             }
-            InstructionDecoded::Jal { rd, imm } => {
+            Instruction::Jal { rd, imm } => {
                 write!(f, "jal {}({})", *imm as i32, REG_NAMES[*rd as usize])
             }
-            InstructionDecoded::ECall => {
+            Instruction::ECall => {
                 write!(f, "ecall")
             }
-            InstructionDecoded::EBreak => {
+            Instruction::EBreak => {
                 write!(f, "ebreak")
             }
-            InstructionDecoded::SRet => {
+            Instruction::SRet => {
                 write!(f, "sret")
             }
-            InstructionDecoded::MRet => {
+            Instruction::MRet => {
                 write!(f, "mret")
             }
-            InstructionDecoded::SFenceVma => {
+            Instruction::SFenceVma => {
                 write!(f, "sfence.vma")
             }
-            InstructionDecoded::CsrRw { rd, rs1, imm } => {
+            Instruction::CsrRw { rd, rs1, imm } => {
                 print_csr!(f, "csrw", "csrrw", rd, rs1, imm)
             }
-            InstructionDecoded::CsrRs { rd, rs1, imm } => {
+            Instruction::CsrRs { rd, rs1, imm } => {
                 print_csr!(f, "csrs", "csrrs", rd, rs1, imm)
             }
-            InstructionDecoded::CsrRc { rd, rs1, imm } => {
+            Instruction::CsrRc { rd, rs1, imm } => {
                 print_csr!(f, "csrc", "csrrc", rd, rs1, imm)
             }
-            InstructionDecoded::CsrRwi { rd, rs1, imm } => {
+            Instruction::CsrRwi { rd, rs1, imm } => {
                 print_csr!(f, "csrwi", "csrrwi", rd, rs1, imm)
             }
-            InstructionDecoded::CsrRsi { rd, rs1, imm } => {
+            Instruction::CsrRsi { rd, rs1, imm } => {
                 print_csr!(f, "csrsi", "csrrsi", rd, rs1, imm)
             }
-            InstructionDecoded::CsrRci { rd, rs1, imm } => {
+            Instruction::CsrRci { rd, rs1, imm } => {
                 print_csr!(f, "csrci", "csrrci", rd, rs1, imm)
             }
-            InstructionDecoded::Fence { pred, succ } => {
+            Instruction::Fence { pred, succ } => {
                 write!(f, "fence {}, {}", *pred as i32, *succ as i32)
             }
-            InstructionDecoded::FenceI { pred, succ } => {
+            Instruction::FenceI { pred, succ } => {
                 write!(f, "fence.i {}, {}", *pred as i32, *succ as i32)
             }
-            InstructionDecoded::Flw { rd, rs1, imm } => {
+            Instruction::Flw { rd, rs1, imm } => {
                 write!(
                     f,
                     "flw {}, {}({})",
                     REG_NAMES[*rd as usize], *imm as i32, REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::Fsw { rs1, rs2, imm } => {
+            Instruction::Fsw { rs1, rs2, imm } => {
                 write!(
                     f,
                     "fsw {}, {}({})",
                     REG_NAMES[*rs2 as usize], *imm as i32, REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::Fld { rd, rs1, imm } => {
+            Instruction::Fld { rd, rs1, imm } => {
                 write!(
                     f,
                     "fld {}, {}({})",
                     REG_NAMES[*rd as usize], *imm as i32, REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::Fsd { rs1, rs2, imm } => {
+            Instruction::Fsd { rs1, rs2, imm } => {
                 write!(
                     f,
                     "fsd {}, {}({})",
                     REG_NAMES[*rs2 as usize], *imm as i32, REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::FmaddS { rd, rs1, rs2, rs3 } => {
+            Instruction::FmaddS { rd, rs1, rs2, rs3 } => {
                 write!(
                     f,
                     "fmadd.s {}, {}, {}, {}",
@@ -999,7 +999,7 @@ impl Display for InstructionDecoded {
                     REG_NAMES[*rs3 as usize]
                 )
             }
-            InstructionDecoded::FmsubS { rd, rs1, rs2, rs3 } => {
+            Instruction::FmsubS { rd, rs1, rs2, rs3 } => {
                 write!(
                     f,
                     "fmsub.s {}, {}, {}, {}",
@@ -1009,7 +1009,7 @@ impl Display for InstructionDecoded {
                     REG_NAMES[*rs3 as usize]
                 )
             }
-            InstructionDecoded::FnmaddS { rd, rs1, rs2, rs3 } => {
+            Instruction::FnmaddS { rd, rs1, rs2, rs3 } => {
                 write!(
                     f,
                     "fnmadd.s {}, {}, {}, {}",
@@ -1019,7 +1019,7 @@ impl Display for InstructionDecoded {
                     REG_NAMES[*rs3 as usize]
                 )
             }
-            InstructionDecoded::FnmsubS { rd, rs1, rs2, rs3 } => {
+            Instruction::FnmsubS { rd, rs1, rs2, rs3 } => {
                 write!(
                     f,
                     "fnmsub.s {}, {}, {}, {}",
@@ -1029,343 +1029,343 @@ impl Display for InstructionDecoded {
                     REG_NAMES[*rs3 as usize]
                 )
             }
-            InstructionDecoded::FaddS { rd, rs1, rs2 } => {
+            Instruction::FaddS { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "fadd.s {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::FsubS { rd, rs1, rs2 } => {
+            Instruction::FsubS { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "fsub.s {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::FmulS { rd, rs1, rs2 } => {
+            Instruction::FmulS { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "fmul.s {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::FdivS { rd, rs1, rs2 } => {
+            Instruction::FdivS { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "fdiv.s {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::FsqrtS { rd, rs1 } => {
+            Instruction::FsqrtS { rd, rs1 } => {
                 write!(
                     f,
                     "fsqrt.s {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::FsgnjS { rd, rs1, rs2 } => {
+            Instruction::FsgnjS { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "fsgnj.s {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::FsgnjnS { rd, rs1, rs2 } => {
+            Instruction::FsgnjnS { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "fsgnjn.s {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::FsgnjxS { rd, rs1, rs2 } => {
+            Instruction::FsgnjxS { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "fsgnjx.s {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::FminS { rd, rs1, rs2 } => {
+            Instruction::FminS { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "fmin.s {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::FmaxS { rd, rs1, rs2 } => {
+            Instruction::FmaxS { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "fmax.s {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::FcvtSW { rd, rs1 } => {
+            Instruction::FcvtSW { rd, rs1 } => {
                 write!(
                     f,
                     "fcvt.s.w {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::FcvtSWU { rd, rs1 } => {
+            Instruction::FcvtSWU { rd, rs1 } => {
                 write!(
                     f,
                     "fcvt.s.wu {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::FcvtWS { rd, rs1 } => {
+            Instruction::FcvtWS { rd, rs1 } => {
                 write!(
                     f,
                     "fcvt.w.s {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::FcvtWUS { rd, rs1 } => {
+            Instruction::FcvtWUS { rd, rs1 } => {
                 write!(
                     f,
                     "fcvt.wu.s {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::FmvXW { rd, rs1 } => {
+            Instruction::FmvXW { rd, rs1 } => {
                 write!(
                     f,
                     "fmv.x.w {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::FmvWX { rd, rs1 } => {
+            Instruction::FmvWX { rd, rs1 } => {
                 write!(
                     f,
                     "fmv.w.x {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::FeqS { rd, rs1, rs2 } => {
+            Instruction::FeqS { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "feq.s {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::FltS { rd, rs1, rs2 } => {
+            Instruction::FltS { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "flt.s {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::FleS { rd, rs1, rs2 } => {
+            Instruction::FleS { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "fle.s {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::FClassS { rd, rs1 } => {
+            Instruction::FClassS { rd, rs1 } => {
                 write!(
                     f,
                     "fclass.s {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::FaddD { rd, rs1, rs2 } => {
+            Instruction::FaddD { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "fadd.d {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::FsubD { rd, rs1, rs2 } => {
+            Instruction::FsubD { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "fsub.d {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::FmulD { rd, rs1, rs2 } => {
+            Instruction::FmulD { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "fmul.d {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::FdivD { rd, rs1, rs2 } => {
+            Instruction::FdivD { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "fdiv.d {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::FsqrtD { rd, rs1 } => {
+            Instruction::FsqrtD { rd, rs1 } => {
                 write!(
                     f,
                     "fsqrt.d {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::FsgnjD { rd, rs1, rs2 } => {
+            Instruction::FsgnjD { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "fsgnj.d {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::FsgnjnD { rd, rs1, rs2 } => {
+            Instruction::FsgnjnD { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "fsgnjn.d {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::FsgnjxD { rd, rs1, rs2 } => {
+            Instruction::FsgnjxD { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "fsgnjx.d {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::FminD { rd, rs1, rs2 } => {
+            Instruction::FminD { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "fmin.d {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::FmaxD { rd, rs1, rs2 } => {
+            Instruction::FmaxD { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "fmax.d {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::FeqD { rd, rs1, rs2 } => {
+            Instruction::FeqD { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "feq.d {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::FltD { rd, rs1, rs2 } => {
+            Instruction::FltD { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "flt.d {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::FleD { rd, rs1, rs2 } => {
+            Instruction::FleD { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "fle.d {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::FClassD { rd, rs1 } => {
+            Instruction::FClassD { rd, rs1 } => {
                 write!(
                     f,
                     "fclass.d {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::FcvtWD { rd, rs1 } => {
+            Instruction::FcvtWD { rd, rs1 } => {
                 write!(
                     f,
                     "fcvt.w.d {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::FcvtWUD { rd, rs1 } => {
+            Instruction::FcvtWUD { rd, rs1 } => {
                 write!(
                     f,
                     "fcvt.wu.d {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::FcvtDW { rd, rs1 } => {
+            Instruction::FcvtDW { rd, rs1 } => {
                 write!(
                     f,
                     "fcvt.d.w {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::FcvtDWU { rd, rs1 } => {
+            Instruction::FcvtDWU { rd, rs1 } => {
                 write!(
                     f,
                     "fcvt.d.wu {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::FcvtDS { rd, rs1 } => {
+            Instruction::FcvtDS { rd, rs1 } => {
                 write!(
                     f,
                     "fcvt.d.s {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::FcvtSD { rd, rs1 } => {
+            Instruction::FcvtSD { rd, rs1 } => {
                 write!(
                     f,
                     "fcvt.s.d {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize]
                 )
             }
-            InstructionDecoded::Mul { rd, rs1, rs2 } => {
+            Instruction::Mul { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "mul {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::Mulh { rd, rs1, rs2 } => {
+            Instruction::Mulh { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "mulh {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::Mulsu { rd, rs1, rs2 } => {
+            Instruction::Mulsu { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "mulsu {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::Mulu { rd, rs1, rs2 } => {
+            Instruction::Mulu { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "mulu {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::Div { rd, rs1, rs2 } => {
+            Instruction::Div { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "div {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::Divu { rd, rs1, rs2 } => {
+            Instruction::Divu { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "divu {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::Rem { rd, rs1, rs2 } => {
+            Instruction::Rem { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "rem {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::Remu { rd, rs1, rs2 } => {
+            Instruction::Remu { rd, rs1, rs2 } => {
                 write!(
                     f,
                     "remu {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], REG_NAMES[*rs2 as usize]
                 )
             }
-            InstructionDecoded::LrW {
+            Instruction::LrW {
                 rd,
                 rs1,
                 rs2,
@@ -1382,7 +1382,7 @@ impl Display for InstructionDecoded {
                     *aq as i32
                 )
             }
-            InstructionDecoded::ScW {
+            Instruction::ScW {
                 rd,
                 rs1,
                 rs2,
@@ -1399,7 +1399,7 @@ impl Display for InstructionDecoded {
                     *aq as i32
                 )
             }
-            InstructionDecoded::AmoswapW {
+            Instruction::AmoswapW {
                 rd,
                 rs1,
                 rs2,
@@ -1416,7 +1416,7 @@ impl Display for InstructionDecoded {
                     *aq as i32
                 )
             }
-            InstructionDecoded::AmoaddW {
+            Instruction::AmoaddW {
                 rd,
                 rs1,
                 rs2,
@@ -1433,7 +1433,7 @@ impl Display for InstructionDecoded {
                     *aq as i32
                 )
             }
-            InstructionDecoded::AmoandW {
+            Instruction::AmoandW {
                 rd,
                 rs1,
                 rs2,
@@ -1450,7 +1450,7 @@ impl Display for InstructionDecoded {
                     *aq as i32
                 )
             }
-            InstructionDecoded::AmoorW {
+            Instruction::AmoorW {
                 rd,
                 rs1,
                 rs2,
@@ -1467,7 +1467,7 @@ impl Display for InstructionDecoded {
                     *aq as i32
                 )
             }
-            InstructionDecoded::AmoxorW {
+            Instruction::AmoxorW {
                 rd,
                 rs1,
                 rs2,
@@ -1484,7 +1484,7 @@ impl Display for InstructionDecoded {
                     *aq as i32
                 )
             }
-            InstructionDecoded::AmomaxW {
+            Instruction::AmomaxW {
                 rd,
                 rs1,
                 rs2,
@@ -1501,7 +1501,7 @@ impl Display for InstructionDecoded {
                     *aq as i32
                 )
             }
-            InstructionDecoded::AmominW {
+            Instruction::AmominW {
                 rd,
                 rs1,
                 rs2,
@@ -1518,24 +1518,24 @@ impl Display for InstructionDecoded {
                     *aq as i32
                 )
             }
-            InstructionDecoded::CNop => {
+            Instruction::CNop => {
                 write!(f, "c.nop")
             }
-            InstructionDecoded::CAddi4Spn { rd, nzuimm } => {
+            Instruction::CAddi4Spn { rd, nzuimm } => {
                 write!(
                     f,
                     "c.addi4spn {}, {}",
                     REG_NAMES[*rd as usize], *nzuimm as i32
                 )
             }
-            InstructionDecoded::CSlli { rd, rs1, shamt } => {
+            Instruction::CSlli { rd, rs1, shamt } => {
                 write!(
                     f,
                     "c.slli {}, {}, {}",
                     REG_NAMES[*rd as usize], REG_NAMES[*rs1 as usize], *shamt as i32
                 )
             }
-            InstructionDecoded::FmaddD { rd, rs1, rs2, rs3 } => {
+            Instruction::FmaddD { rd, rs1, rs2, rs3 } => {
                 write!(
                     f,
                     "fmadd.d {}, {}, {}, {}",
@@ -1545,7 +1545,7 @@ impl Display for InstructionDecoded {
                     REG_NAMES[*rs3 as usize]
                 )
             }
-			InstructionDecoded::FmsubD { rd, rs1, rs2, rs3 } => {
+			Instruction::FmsubD { rd, rs1, rs2, rs3 } => {
 				write!(
 					f,
 					"fmsub.d {}, {}, {}, {}",
@@ -1555,7 +1555,7 @@ impl Display for InstructionDecoded {
 					REG_NAMES[*rs3 as usize]
 				)
 			}
-			InstructionDecoded::FnmsubD { rd, rs1, rs2, rs3 } => {
+			Instruction::FnmsubD { rd, rs1, rs2, rs3 } => {
 				write!(
 					f,
 					"fnmsub.d {}, {}, {}, {}",
@@ -1565,7 +1565,7 @@ impl Display for InstructionDecoded {
 					REG_NAMES[*rs3 as usize]
 				)
 			}
-			InstructionDecoded::FnmaddD { rd, rs1, rs2, rs3 } => {
+			Instruction::FnmaddD { rd, rs1, rs2, rs3 } => {
 				write!(
 					f,
 					"fnmadd.d {}, {}, {}, {}",
