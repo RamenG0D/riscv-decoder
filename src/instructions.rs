@@ -1,4 +1,7 @@
 use instruction_creator::instructions;
+use crate::decoder::OPCODE_MASK;
+use anyhow::bail;
+
 
 pub type InstructionSize = u32;
 pub type SignedInstructionSize = i32;
@@ -11,6 +14,30 @@ pub enum InstructionFormat {
     UType,
     BType,
     JType,
+}
+
+impl TryFrom<InstructionSize> for InstructionFormat {
+	type Error = anyhow::Error;
+
+	fn try_from(value: InstructionSize) -> Result<Self, Self::Error> {
+		match value & OPCODE_MASK {
+			FNMSUBD_FMT
+			| FNMADDD_FMT
+			| FMSUBD_FMT
+			| FMADDD_FMT
+			| FLOATING_POINT_FMT
+			| ATOMIC_FMT
+			| ARITMETIC_REGISTER_FMT => Ok(InstructionFormat::RType),
+			FSTORE_FMT | STORE_FMT => Ok(InstructionFormat::SType),
+			BRANCH_FMT => Ok(InstructionFormat::BType),
+			JAL_FMT => Ok(InstructionFormat::JType),
+			FLOAD_FMT | ARITMETIC_IMMEDIATE_FMT | FENCE_FMT | LOAD_FMT | CSR_FMT | JALR_FMT => {
+				Ok(InstructionFormat::IType)
+			}
+			LUI_FMT | AUIPC_FMT => Ok(InstructionFormat::UType),
+			_ => bail!("Unknown instruction format for instruction {value:#08X}"),
+		}
+	}
 }
 
 instructions! {
@@ -509,26 +536,26 @@ pub mod compressed {
     }
 }
 
-pub const LOAD_MATCH: InstructionSize = 3;
-pub const FLOAD_MATCH: InstructionSize = 7;
-pub const FENCE_MATCH: InstructionSize = 15;
-pub const ARITMETIC_IMMEDIATE_MATCH: InstructionSize = 19;
-pub const AUIPC_MATCH: InstructionSize = 23;
-pub const LUI_MATCH: InstructionSize = 55;
-pub const FSTORE_MATCH: InstructionSize = 39;
-pub const STORE_MATCH: InstructionSize = 35;
-pub const ARITMETIC_REGISTER_MATCH: InstructionSize = 51;
-pub const FLOAT_MATCH: InstructionSize = 83;
-pub const FLOATING_POINT_MATCH: InstructionSize = 83;
-pub const BRANCH_MATCH: InstructionSize = 99;
-pub const CSR_MATCH: InstructionSize = 115;
-pub const JALR_MATCH: InstructionSize = 103;
-pub const JAL_MATCH: InstructionSize = 111;
-pub const ATOMIC_MATCH: InstructionSize = 47;
-pub const FMADDD_MATCH: InstructionSize = 67;
-pub const FMSUBD_MATCH: InstructionSize = 71;
-pub const FNMADDD_MATCH: InstructionSize = 79;
-pub const FNMSUBD_MATCH: InstructionSize = 75;
+pub const LOAD_FMT: InstructionSize = 3;
+pub const FLOAD_FMT: InstructionSize = 7;
+pub const FENCE_FMT: InstructionSize = 15;
+pub const ARITMETIC_IMMEDIATE_FMT: InstructionSize = 19;
+pub const AUIPC_FMT: InstructionSize = 23;
+pub const LUI_FMT: InstructionSize = 55;
+pub const FSTORE_FMT: InstructionSize = 39;
+pub const STORE_FMT: InstructionSize = 35;
+pub const ARITMETIC_REGISTER_FMT: InstructionSize = 51;
+pub const FLOAT_FMT: InstructionSize = 83;
+pub const FLOATING_POINT_FMT: InstructionSize = 83;
+pub const BRANCH_FMT: InstructionSize = 99;
+pub const CSR_FMT: InstructionSize = 115;
+pub const JALR_FMT: InstructionSize = 103;
+pub const JAL_FMT: InstructionSize = 111;
+pub const ATOMIC_FMT: InstructionSize = 47;
+pub const FMADDD_FMT: InstructionSize = 67;
+pub const FMSUBD_FMT: InstructionSize = 71;
+pub const FNMADDD_FMT: InstructionSize = 79;
+pub const FNMSUBD_FMT: InstructionSize = 75;
 
 pub mod rtype {
     use super::InstructionSize;
@@ -538,12 +565,12 @@ pub mod rtype {
         pub struct RType(InstructionSize);
         impl Debug;
         InstructionSize;
-        pub opcode, _: 6, 0;
-        pub rd, _:     11, 7;
-        pub funct3, _: 14, 12;
-        pub rs1, _:    19, 15;
-        pub rs2, _:    24, 20;
-        pub funct7, _: 31, 25;
+        pub opcode, _:  6, 0;
+        pub rd,     _:  11, 7;
+        pub funct3, _:  14, 12;
+        pub rs1,    _: 19, 15;
+        pub rs2,    _: 24, 20;
+        pub funct7, _:  31, 25;
     }
 
     impl RType {
@@ -629,11 +656,11 @@ pub mod itype {
         assert_eq!(inst.rd(), 15);
         assert_eq!(inst.rs1(), 15);
         assert_eq!(inst.imm(), 3);
-        use crate::{decoded_inst::InstructionDecoded, decoder::try_decode};
+        use crate::{decoded_inst::Instruction, decoder::try_decode};
         let inst = try_decode(0x379793 /* slli a5, a5, 3 */).unwrap();
         assert!(matches!(
             inst,
-            InstructionDecoded::Slli {
+            Instruction::Slli {
                 rd: 15,
                 rs1: 15,
                 imm: 3
@@ -766,9 +793,8 @@ pub mod btype {
 }
 
 pub mod jtype {
-    use crate::bit_ops;
-
     use super::{InstructionSize, SignedInstructionSize};
+    use bit_ops::BitOps;
     use bitfield::bitfield;
 
     bitfield! {
@@ -784,22 +810,22 @@ pub mod jtype {
         }
 
         fn imm1(&self) -> InstructionSize {
-            let imm = (bit_ops::get_bit(self.0, 31) << 31) as SignedInstructionSize;
+            let imm = (self.0.get_bit(31) << 31) as SignedInstructionSize;
             (imm >> 11) as InstructionSize
         }
 
         fn imm2(&self) -> InstructionSize {
-            bit_ops::get_bits(self.0, 8, 12) << 12
+            self.0.get_bits(8, 12) << 12
         }
 
         fn imm3(&self) -> InstructionSize {
             let imm = self.0 >> 9 /* now get bit 11 */;
-            bit_ops::get_bit(imm, 11) << 11
+            imm.get_bit(11) << 11
         }
 
         fn imm4(&self) -> InstructionSize {
             let imm = self.0 >> 20 /* now get bits 10:1 */;
-            bit_ops::get_bits(imm, 10, 1) << 1
+            imm.get_bits(10, 1) << 1
         }
 
         pub fn imm(&self) -> InstructionSize {
